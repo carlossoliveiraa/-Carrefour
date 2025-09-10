@@ -1,7 +1,10 @@
 using CarlosAOliveira.Developer.Api.DTOs.Auth;
 using CarlosAOliveira.Developer.Api.Services;
+using CarlosAOliveira.Developer.Application.Commands.User;
+using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.Domain.Enums;
 using CarlosAOliveira.Developer.Domain.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -18,15 +21,18 @@ namespace CarlosAOliveira.Developer.Api.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtService _jwtService;
+        private readonly IMediator _mediator;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
             IUserRepository userRepository,
             IJwtService jwtService,
+            IMediator mediator,
             ILogger<AuthController> logger)
         {
             _userRepository = userRepository;
             _jwtService = jwtService;
+            _mediator = mediator;
             _logger = logger;
         }
 
@@ -177,6 +183,76 @@ namespace CarlosAOliveira.Developer.Api.Controllers
             {
                 _logger.LogError(ex, "Error getting current user");
                 return StatusCode(500, new { message = "An error occurred while getting user information" });
+            }
+        }
+
+        /// <summary>
+        /// Creates a new user account
+        /// </summary>
+        /// <param name="request">Create user request</param>
+        /// <returns>Created user and JWT tokens</returns>
+        [HttpPost("register")]
+        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Registering new user with email: {Email}", request.Email);
+
+                var command = new CreateUserCommand
+                {
+                    Username = request.Username,
+                    Email = request.Email,
+                    Password = request.Password,
+                    Phone = request.Phone
+                };
+
+                var result = await _mediator.Send(command);
+
+                if (!result.Success)
+                {
+                    if (result.Message?.Contains("already exists") == true)
+                    {
+                        return Conflict(new { message = result.Message });
+                    }
+                    return BadRequest(new { message = result.Message, errors = result.Errors });
+                }
+
+                // Get the created user
+                var user = await _userRepository.GetByIdAsync(result.Data!.Id);
+                if (user == null)
+                {
+                    return StatusCode(500, new { message = "User created but could not be retrieved" });
+                }
+
+                // Generate JWT tokens
+                var accessToken = _jwtService.GenerateAccessToken(user);
+                var refreshToken = _jwtService.GenerateRefreshToken();
+
+                var response = new LoginResponse
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(60),
+                    User = new UserInfo
+                    {
+                        Id = user.Id,
+                        Name = user.Username,
+                        Email = user.Email,
+                        Role = user.Role.ToString(),
+                        Status = user.Status.ToString()
+                    }
+                };
+
+                _logger.LogInformation("User registered successfully: {UserId}", user.Id);
+                return CreatedAtAction(nameof(GetCurrentUser), new { }, response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during user registration for email: {Email}", request.Email);
+                return StatusCode(500, new { message = "An error occurred during registration" });
             }
         }
     }
