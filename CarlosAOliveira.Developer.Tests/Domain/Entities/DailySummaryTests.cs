@@ -53,6 +53,10 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
             var transaction = TransactionBuilder.Create()
                 .WithMerchantId(summary.MerchantId)
                 .Build();
+            
+            // Manually set the transaction date to yesterday to make it different
+            var yesterday = DateTime.Today.AddDays(-1);
+            transaction.GetType().GetProperty("CreatedAt")!.SetValue(transaction, yesterday);
 
             // Act & Assert
             var action = () => summary.AddTransaction(transaction);

@@ -62,3 +62,4 @@ namespace CarlosAOliveira.Developer.Domain.Repositories
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
+
