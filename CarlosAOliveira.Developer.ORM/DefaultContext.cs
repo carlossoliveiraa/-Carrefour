@@ -23,24 +23,25 @@ namespace CarlosAOliveira.Developer.ORM
             base.OnModelCreating(modelBuilder);
         }
     }
-    //public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
-    //{
-    //    public DefaultContext CreateDbContext(string[] args)
-    //    {
-    //        IConfigurationRoot configuration = new ConfigurationBuilder()
-    //            .SetBasePath(Directory.GetCurrentDirectory())
-    //            .AddJsonFile("appsettings.json")
-    //            .Build();
+    public class DefaultContextFactory : IDesignTimeDbContextFactory<DefaultContext>
+    {
+        public DefaultContext CreateDbContext(string[] args)
+        {
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "..", "CarlosAOliveira.Developer.Api"))
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.Development.json", optional: true)
+                .Build();
 
-    //        var builder = new DbContextOptionsBuilder<DefaultContext>();
-    //        var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var builder = new DbContextOptionsBuilder<DefaultContext>();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
                        
-    //        builder.UseSqlServer(
-    //            connectionString,
-    //            b => b.MigrationsAssembly("CarlosAOliveira.Developer.WebApi")
-    //        );
+            builder.UseSqlServer(
+                connectionString,
+                b => b.MigrationsAssembly("CarlosAOliveira.Developer.ORM")
+            );
 
-    //        return new DefaultContext(builder.Options);
-    //    }
-    //}
+            return new DefaultContext(builder.Options);
+        }
+    }
 }

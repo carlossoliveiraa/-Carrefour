@@ -24,6 +24,7 @@ namespace CarlosAOliveira.Developer.ORM
             services.AddScoped<IMerchantRepository, MerchantRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IDailySummaryRepository, DailySummaryRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }
