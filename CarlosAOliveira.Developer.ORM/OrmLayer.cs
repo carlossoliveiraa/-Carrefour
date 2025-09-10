@@ -21,6 +21,7 @@ namespace CarlosAOliveira.Developer.ORM
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             // Repositories
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IMerchantRepository, MerchantRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IDailySummaryRepository, DailySummaryRepository>();
