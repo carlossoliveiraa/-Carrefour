@@ -68,3 +68,4 @@ namespace CarlosAOliveira.Developer.ORM.Configurations
         }
     }
 }
+

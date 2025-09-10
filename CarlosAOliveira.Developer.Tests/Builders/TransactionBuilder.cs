@@ -13,13 +13,15 @@ namespace CarlosAOliveira.Developer.Tests.Builders
         private decimal _amount = 0;
         private TransactionType _type = TransactionType.Credit;
         private string _description = string.Empty;
+        private TransactionStatus _status = TransactionStatus.Pending;
 
         public TransactionBuilder()
         {
             _merchantId = RandomGuid();
             _amount = RandomAmount();
-            _type = Faker.PickRandom<TransactionType>();
+            _type = TransactionType.Credit;
             _description = RandomDescription();
+            _status = TransactionStatus.Pending;
         }
 
         public static TransactionBuilder Create() => new();
@@ -48,15 +50,9 @@ namespace CarlosAOliveira.Developer.Tests.Builders
             return this;
         }
 
-        public TransactionBuilder AsCredit()
+        public TransactionBuilder WithStatus(TransactionStatus status)
         {
-            _type = TransactionType.Credit;
-            return this;
-        }
-
-        public TransactionBuilder AsDebit()
-        {
-            _type = TransactionType.Debit;
+            _status = status;
             return this;
         }
 
@@ -66,6 +62,19 @@ namespace CarlosAOliveira.Developer.Tests.Builders
             _amount = RandomAmount();
             _type = Faker.PickRandom<TransactionType>();
             _description = RandomDescription();
+            _status = Faker.PickRandom<TransactionStatus>();
+            return this;
+        }
+
+        public TransactionBuilder AsCredit()
+        {
+            _type = TransactionType.Credit;
+            return this;
+        }
+
+        public TransactionBuilder AsDebit()
+        {
+            _type = TransactionType.Debit;
             return this;
         }
 

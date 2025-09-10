@@ -27,6 +27,27 @@ namespace CarlosAOliveira.Developer.Domain.Entities
             TransactionCount = 0;
         }
 
+        public DailySummary(Guid merchantId, DateTime date, decimal netAmount, int transactionCount)
+        {
+            Id = Guid.NewGuid();
+            MerchantId = merchantId;
+            Date = date.Date; // Ensure only date part
+            NetAmount = netAmount;
+            TransactionCount = transactionCount;
+            
+            // Calculate credits and debits based on net amount
+            if (netAmount >= 0)
+            {
+                TotalCredits = netAmount;
+                TotalDebits = 0;
+            }
+            else
+            {
+                TotalCredits = 0;
+                TotalDebits = Math.Abs(netAmount);
+            }
+        }
+
         /// <summary>
         /// Adds a transaction to the daily summary
         /// </summary>
