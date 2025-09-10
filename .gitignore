@@ -1,0 +1,54 @@
+# Build outputs
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.bak
+*.swp
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Package files
+*.pdb
+*.dll
+*.exe
