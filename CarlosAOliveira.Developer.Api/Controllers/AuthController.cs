@@ -6,6 +6,7 @@ using CarlosAOliveira.Developer.Domain.Enums;
 using CarlosAOliveira.Developer.Domain.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -19,18 +20,18 @@ namespace CarlosAOliveira.Developer.Api.Controllers
     [Produces("application/json")]
     public class AuthController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserManager<Domain.Entities.User> _userManager;
         private readonly IJwtService _jwtService;
         private readonly IMediator _mediator;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
-            IUserRepository userRepository,
+            UserManager<Domain.Entities.User> userManager,
             IJwtService jwtService,
             IMediator mediator,
             ILogger<AuthController> logger)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
             _jwtService = jwtService;
             _mediator = mediator;
             _logger = logger;
@@ -51,7 +52,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
             {
                 _logger.LogInformation("Login attempt for email: {Email}", request.Email);
 
-                var user = await _userRepository.GetByEmailAsync(request.Email);
+                var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user == null || user.Status != UserStatus.Active)
                 {
                     _logger.LogWarning("Login failed for email: {Email} - User not found or inactive", request.Email);
@@ -71,7 +72,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     User = new UserInfo
                     {
                         Id = user.Id,
-                        Name = user.Username,
+                        Name = user.UserName,
                         Email = user.Email,
                         Role = user.Role.ToString(),
                         Status = user.Status.ToString()
@@ -110,7 +111,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     return Unauthorized(new { message = "Invalid refresh token" });
                 }
 
-                var user = await _userRepository.GetByIdAsync(userId);
+                var user = await _userManager.FindByIdAsync(userId.ToString());
                 if (user == null || user.Status != UserStatus.Active)
                 {
                     return Unauthorized(new { message = "User not found or inactive" });
@@ -127,7 +128,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     User = new UserInfo
                     {
                         Id = user.Id,
-                        Name = user.Username,
+                        Name = user.UserName,
                         Email = user.Email,
                         Role = user.Role.ToString(),
                         Status = user.Status.ToString()
@@ -162,7 +163,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     return Unauthorized(new { message = "Invalid token" });
                 }
 
-                var user = await _userRepository.GetByIdAsync(userId);
+                var user = await _userManager.FindByIdAsync(userId.ToString());
                 if (user == null)
                 {
                     return NotFound(new { message = "User not found" });
@@ -171,7 +172,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                 var userInfo = new UserInfo
                 {
                     Id = user.Id,
-                    Name = user.Username,
+                    Name = user.UserName,  
                     Email = user.Email,
                     Role = user.Role.ToString(),
                     Status = user.Status.ToString()
@@ -221,7 +222,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                 }
 
                 // Get the created user
-                var user = await _userRepository.GetByIdAsync(result.Data!.Id);
+                var user = await _userManager.FindByIdAsync(result.Data!.Id.ToString());
                 if (user == null)
                 {
                     return StatusCode(500, new { message = "User created but could not be retrieved" });
@@ -239,7 +240,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     User = new UserInfo
                     {
                         Id = user.Id,
-                        Name = user.Username,
+                        Name = user.UserName,
                         Email = user.Email,
                         Role = user.Role.ToString(),
                         Status = user.Status.ToString()

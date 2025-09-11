@@ -12,6 +12,8 @@ namespace CarlosAOliveira.Developer.Application.Mappings
         public UserMappingProfile()
         {
             CreateMap<Domain.Entities.User, UserDto>()
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }

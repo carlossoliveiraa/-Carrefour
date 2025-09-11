@@ -134,7 +134,7 @@ app.MapControllers();
 
 app.MapHealthChecks("/health");
 
-// Ensure database is created
+// Ensure database is created and migrations are applied
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<CarlosAOliveira.Developer.ORM.DefaultContext>();
