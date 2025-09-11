@@ -1,6 +1,6 @@
 # 💰 Sistema Cashflow
 
-Sistema de lançamentos financeiros diários com consolidado de saldo por dia, implementado em .NET 9 com **arquitetura de nível sênior** seguindo princípios de Clean Architecture e Domain-Driven Design.
+Sistema de lançamentos financeiros diários com consolidado de saldo por dia, implementado em .NET 9 seguindo princípios de Clean Architecture e Domain-Driven Design.
 
 ## 🏗️ Arquitetura
 
@@ -78,7 +78,7 @@ dotnet test
 curl https://localhost:7001/health
 ```
 
-## 📊 Endpoints da API Refatorada
+## 📊 Endpoints da API
 
 ### 🔐 Autenticação
 
@@ -294,17 +294,6 @@ dotnet test --filter "Category=Integration"
 - [ ] Audit logs
 
 ## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
+Carlos A Oliveira
 
 **Sistema Cashflow - Refatorado com Arquitetura de Nível Sênior** 🚀
