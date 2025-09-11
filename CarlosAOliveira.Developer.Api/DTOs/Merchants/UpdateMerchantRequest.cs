@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace CarlosAOliveira.Developer.Api.DTOs.Merchants
 {
     /// <summary>
-    /// Update merchant request DTO
+    /// Request DTO for updating a merchant
     /// </summary>
     public class UpdateMerchantRequest
     {
@@ -11,7 +11,7 @@ namespace CarlosAOliveira.Developer.Api.DTOs.Merchants
         /// Merchant name
         /// </summary>
         [Required(ErrorMessage = "Name is required")]
-        [StringLength(200, ErrorMessage = "Name cannot exceed 200 characters")]
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>

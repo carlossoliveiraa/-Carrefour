@@ -25,7 +25,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Events
             // Assert
             Assert.Equal(transaction.Id, domainEvent.TransactionId);
             Assert.Equal(transaction.Date, domainEvent.Date);
-            Assert.Equal(transaction.Amount, domainEvent.Amount);
+            Assert.Equal(transaction.Amount.Amount, domainEvent.Amount);
             Assert.Equal(transaction.Type.ToString(), domainEvent.TransactionType);
             Assert.Equal(transaction.Category, domainEvent.Category);
             Assert.Equal(transaction.Description, domainEvent.Description);
@@ -49,7 +49,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Events
 
             // Assert
             Assert.Equal("Debit", domainEvent.TransactionType);
-            Assert.Equal(transaction.Amount, domainEvent.Amount);
+            Assert.Equal(transaction.Amount.Amount, domainEvent.Amount);
         }
     }
 }

@@ -1,5 +1,4 @@
 using CarlosAOliveira.Developer.Api.Configuration;
-using CarlosAOliveira.Developer.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,20 +23,18 @@ namespace CarlosAOliveira.Developer.Api.Services
         }
 
         /// <summary>
-        /// Generates a JWT access token for the user
+        /// Generates a JWT access token for a merchant
         /// </summary>
-        public string GenerateAccessToken(User user)
+        public string GenerateAccessToken(Guid merchantId, string merchantName)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
-                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
-                new Claim(ClaimTypes.Role, user.Role.ToString()),
-                new Claim("status", user.Status.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, merchantId.ToString()),
+                new Claim(ClaimTypes.Name, merchantName),
+                new Claim(ClaimTypes.Role, "Merchant"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, 
                     new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), 
@@ -97,14 +94,14 @@ namespace CarlosAOliveira.Developer.Api.Services
         }
 
         /// <summary>
-        /// Extracts user ID from JWT token
+        /// Extracts merchant ID from JWT token
         /// </summary>
-        public Guid? GetUserIdFromToken(string token)
+        public Guid? GetMerchantIdFromToken(string token)
         {
             var principal = ValidateToken(token);
-            var userIdClaim = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var merchantIdClaim = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
-            return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+            return Guid.TryParse(merchantIdClaim, out var merchantId) ? merchantId : null;
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using CarlosAOliveira.Developer.Application.Mappings;
+using CarlosAOliveira.Developer.Application.Services;
+using CarlosAOliveira.Developer.Common.Validation;
 using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -24,6 +27,18 @@ namespace CarlosAOliveira.Developer.Application
 
             // FluentValidation
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // Validation Behavior for MediatR
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+            // Application Services
+            services.AddScoped<IValidationService, ValidationService>();
+            services.AddScoped<ICashflowApplicationService, CashflowApplicationService>();
+            services.AddScoped<ICacheService, MemoryCacheService>();
+            services.AddScoped<IMetricsService, LoggingMetricsService>();
+
+            // Memory Cache
+            services.AddMemoryCache();
 
             return services;
         }

@@ -130,6 +130,10 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
+// Custom middleware pipeline
+app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<RateLimitingMiddleware>();
+app.UseMiddleware<ValidationMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthentication();

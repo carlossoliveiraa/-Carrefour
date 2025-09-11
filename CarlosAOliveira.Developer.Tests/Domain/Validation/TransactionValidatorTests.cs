@@ -64,7 +64,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var result = _validator.TestValidate(transaction);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Amount)
+            result.ShouldHaveValidationErrorFor(x => x.Amount.Amount)
                 .WithErrorMessage("Amount must be greater than zero");
         }
 
@@ -84,7 +84,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var result = _validator.TestValidate(transaction);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(x => x.Amount);
+            result.ShouldNotHaveValidationErrorFor(x => x.Amount.Amount);
         }
 
         [Theory]
@@ -153,9 +153,9 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
 
             // Assert
             // MerchantId validation is no longer applicable
-            result.ShouldHaveValidationErrorFor(x => x.Amount);
+            result.ShouldHaveValidationErrorFor(x => x.Amount.Amount);
             result.ShouldHaveValidationErrorFor(x => x.Description);
-            result.Errors.Should().HaveCount(3);
+            result.Errors.Should().HaveCount(2);
         }
 
         [Fact]

@@ -41,7 +41,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
 
             // Assert
             context.Should().NotBeNull();
-            context.Users.Should().NotBeNull();
+            // Users DbSet removed - User entity was deleted
             context.Merchants.Should().NotBeNull();
             context.Transactions.Should().NotBeNull();
             context.DailySummaries.Should().NotBeNull();
@@ -107,19 +107,19 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
         public async Task DbSets_ShouldBeAccessible()
         {
             // Arrange & Act
-            var users = _context.Users;
+            // Users DbSet removed - User entity was deleted
             var merchants = _context.Merchants;
             var transactions = _context.Transactions;
             var dailySummaries = _context.DailySummaries;
 
             // Assert
-            users.Should().NotBeNull();
+            // Users DbSet removed - User entity was deleted
             merchants.Should().NotBeNull();
             transactions.Should().NotBeNull();
             dailySummaries.Should().NotBeNull();
             
             // Verify they are empty initially
-            (await users.CountAsync()).Should().Be(0);
+            // Users DbSet removed - User entity was deleted
             (await merchants.CountAsync()).Should().Be(0);
             (await transactions.CountAsync()).Should().Be(0);
             (await dailySummaries.CountAsync()).Should().Be(0);

@@ -2,6 +2,7 @@ using AutoMapper;
 using CarlosAOliveira.Developer.Application.Commands.Cashflow;
 using CarlosAOliveira.Developer.Application.DTOs.Base;
 using CarlosAOliveira.Developer.Application.DTOs.Cashflow;
+using CarlosAOliveira.Developer.Application.Services;
 using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.Domain.Enums;
 using CarlosAOliveira.Developer.Domain.Events;
@@ -18,23 +19,33 @@ namespace CarlosAOliveira.Developer.Application.Handlers.Cashflow
         private readonly ITransactionRepository _transactionRepository;
         private readonly IEventQueue _eventQueue;
         private readonly IMapper _mapper;
+        private readonly IValidationService _validationService;
 
         public CreateTransactionCommandHandler(
             ITransactionRepository transactionRepository,
             IEventQueue eventQueue,
-            IMapper mapper)
+            IMapper mapper,
+            IValidationService validationService)
         {
             _transactionRepository = transactionRepository;
             _eventQueue = eventQueue;
             _mapper = mapper;
+            _validationService = validationService;
         }
 
         public async Task<BaseResponse<TransactionResponse>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                // Validate transaction type
-                if (!Enum.TryParse<TransactionType>(request.Type, out var transactionType))
+                // Validate business rules
+                var validationResult = await _validationService.ValidateTransactionAsync(request.Amount, request.Type, request.Date);
+                if (!validationResult.Success)
+                {
+                    return BaseResponse<TransactionResponse>.CreateError(validationResult.Message ?? "Validation failed", validationResult.Errors);
+                }
+
+                // Parse transaction type
+                if (!Enum.TryParse<TransactionType>(request.Type, true, out var transactionType))
                 {
                     return BaseResponse<TransactionResponse>.CreateError("Invalid transaction type. Must be 'Credit' or 'Debit'");
                 }

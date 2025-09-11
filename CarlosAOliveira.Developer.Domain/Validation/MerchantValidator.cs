@@ -14,7 +14,7 @@ namespace CarlosAOliveira.Developer.Domain.Validation
                 .NotEmpty().WithMessage("Merchant name is required")
                 .MaximumLength(100).WithMessage("Merchant name cannot exceed 100 characters");
 
-            RuleFor(x => x.Email)
+            RuleFor(x => x.Email.Value)
                 .NotEmpty().WithMessage("Email is required")
                 .EmailAddress().WithMessage("Invalid email format");
         }

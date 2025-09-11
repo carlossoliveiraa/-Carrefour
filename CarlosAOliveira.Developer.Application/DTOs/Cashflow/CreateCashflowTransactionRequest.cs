@@ -1,18 +1,17 @@
-using CarlosAOliveira.Developer.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace CarlosAOliveira.Developer.Api.DTOs.Transactions
+namespace CarlosAOliveira.Developer.Application.DTOs.Cashflow
 {
     /// <summary>
-    /// Create transaction request DTO
+    /// Request DTO for creating a cashflow transaction
     /// </summary>
-    public class CreateTransactionRequest
+    public class CreateCashflowTransactionRequest
     {
         /// <summary>
-        /// Merchant ID
+        /// Transaction date
         /// </summary>
-        [Required(ErrorMessage = "Merchant ID is required")]
-        public Guid MerchantId { get; set; }
+        [Required(ErrorMessage = "Date is required")]
+        public DateOnly Date { get; set; }
 
         /// <summary>
         /// Transaction amount
@@ -22,10 +21,17 @@ namespace CarlosAOliveira.Developer.Api.DTOs.Transactions
         public decimal Amount { get; set; }
 
         /// <summary>
-        /// Transaction type
+        /// Transaction type (Credit or Debit)
         /// </summary>
         [Required(ErrorMessage = "Transaction type is required")]
-        public TransactionType Type { get; set; }
+        public string Type { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Transaction category
+        /// </summary>
+        [Required(ErrorMessage = "Category is required")]
+        [StringLength(100, ErrorMessage = "Category cannot exceed 100 characters")]
+        public string Category { get; set; } = string.Empty;
 
         /// <summary>
         /// Transaction description

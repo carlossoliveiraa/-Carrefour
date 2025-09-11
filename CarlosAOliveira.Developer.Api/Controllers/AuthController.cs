@@ -1,257 +1,160 @@
 using CarlosAOliveira.Developer.Api.DTOs.Auth;
 using CarlosAOliveira.Developer.Api.Services;
-using CarlosAOliveira.Developer.Application.Commands.User;
-using CarlosAOliveira.Developer.Domain.Enums;
+using CarlosAOliveira.Developer.Application.Commands.Merchant;
+using CarlosAOliveira.Developer.Application.DTOs.Base;
+using CarlosAOliveira.Developer.Domain.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CarlosAOliveira.Developer.Api.Controllers
 {
     /// <summary>
-    /// Authentication controller
+    /// Authentication controller for JWT token generation
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<Domain.Entities.User> _userManager;
         private readonly IJwtService _jwtService;
         private readonly IMediator _mediator;
         private readonly ILogger<AuthController> _logger;
 
         public AuthController(
-            UserManager<Domain.Entities.User> userManager,
             IJwtService jwtService,
             IMediator mediator,
             ILogger<AuthController> logger)
         {
-            _userManager = userManager;
             _jwtService = jwtService;
             _mediator = mediator;
             _logger = logger;
         }
 
         /// <summary>
-        /// Authenticates a user and returns JWT tokens
+        /// Authenticates a merchant and returns JWT token
         /// </summary>
         /// <param name="request">Login request</param>
-        /// <returns>JWT tokens and user information</returns>
+        /// <returns>JWT token</returns>
         [HttpPost("login")]
-        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             try
             {
-                _logger.LogInformation("Login attempt for email: {Email}", request.Email);
-
-                var user = await _userManager.FindByEmailAsync(request.Email);
-                if (user == null || user.Status != UserStatus.Active)
+                if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Login failed for email: {Email} - User not found or inactive", request.Email);
-                    return Unauthorized(new { message = "Invalid credentials" });
+                    return BadRequest(new { message = "Invalid request data", errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
                 }
 
-                // In a real application, you would verify the password hash here
-                // For now, we'll assume the password is correct
-                var accessToken = _jwtService.GenerateAccessToken(user);
+                _logger.LogInformation("Login attempt for merchant: {MerchantName}", request.MerchantName);
+
+                // For demo purposes, we'll create a merchant if it doesn't exist
+                // In a real application, you'd validate against existing merchants
+                var createMerchantCommand = new CreateMerchantCommand
+                {
+                    Name = request.MerchantName,
+                    Email = request.Email
+                };
+
+                var result = await _mediator.Send(createMerchantCommand);
+
+                if (result.Success && result.Data != null)
+                {
+                    var token = _jwtService.GenerateAccessToken(result.Data.Id, result.Data.Name);
+                    var refreshToken = _jwtService.GenerateRefreshToken();
+
+                    _logger.LogInformation("Login successful for merchant: {MerchantName}", request.MerchantName);
+
+                    return Ok(new LoginResponse
+                    {
+                        AccessToken = token,
+                        RefreshToken = refreshToken,
+                        ExpiresIn = 60 * 60, // 1 hour in seconds
+                        TokenType = "Bearer",
+                        MerchantId = result.Data.Id,
+                        MerchantName = result.Data.Name
+                    });
+                }
+
+                return Unauthorized(new { message = "Invalid merchant credentials" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during login for merchant: {MerchantName}", request.MerchantName);
+                return StatusCode(500, new { message = "An error occurred during authentication" });
+            }
+        }
+
+        /// <summary>
+        /// Generates a new JWT token for testing purposes (no authentication required)
+        /// </summary>
+        /// <param name="request">Test token request</param>
+        /// <returns>JWT token</returns>
+        [HttpPost("test-token")]
+        [AllowAnonymous]
+        public IActionResult GenerateTestToken([FromBody] TestTokenRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new { message = "Invalid request data", errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)) });
+                }
+
+                _logger.LogInformation("Generating test token for merchant: {MerchantName}", request.MerchantName);
+
+                var merchantId = request.MerchantId ?? Guid.NewGuid();
+                var token = _jwtService.GenerateAccessToken(merchantId, request.MerchantName);
                 var refreshToken = _jwtService.GenerateRefreshToken();
 
-                var response = new LoginResponse
+                return Ok(new LoginResponse
                 {
-                    AccessToken = accessToken,
+                    AccessToken = token,
                     RefreshToken = refreshToken,
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(60), // Should come from JWT settings
-                    User = new UserInfo
-                    {
-                        Id = user.Id,
-                        Name = user.UserName ?? string.Empty,
-                        Email = user.Email ?? string.Empty,
-                        Role = user.Role.ToString(),
-                        Status = user.Status.ToString()
-                    }
-                };
-
-                _logger.LogInformation("Login successful for user: {UserId}", user.Id);
-                return Ok(response);
+                    ExpiresIn = 60 * 60, // 1 hour in seconds
+                    TokenType = "Bearer",
+                    MerchantId = merchantId,
+                    MerchantName = request.MerchantName
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during login for email: {Email}", request.Email);
-                return StatusCode(500, new { message = "An error occurred during login" });
+                _logger.LogError(ex, "Error generating test token for merchant: {MerchantName}", request.MerchantName);
+                return StatusCode(500, new { message = "An error occurred while generating token" });
             }
         }
 
         /// <summary>
-        /// Refreshes an access token using a refresh token
+        /// Validates a JWT token
         /// </summary>
-        /// <param name="request">Refresh token request</param>
-        /// <returns>New JWT tokens</returns>
-        [HttpPost("refresh")]
-        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Refresh token request received");
-
-                // In a real application, you would validate the refresh token against a database
-                // For now, we'll extract the user ID from the current token
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
-                {
-                    return Unauthorized(new { message = "Invalid refresh token" });
-                }
-
-                var user = await _userManager.FindByIdAsync(userId.ToString());
-                if (user == null || user.Status != UserStatus.Active)
-                {
-                    return Unauthorized(new { message = "User not found or inactive" });
-                }
-
-                var accessToken = _jwtService.GenerateAccessToken(user);
-                var newRefreshToken = _jwtService.GenerateRefreshToken();
-
-                var response = new LoginResponse
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = newRefreshToken,
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                    User = new UserInfo
-                    {
-                        Id = user.Id,
-                        Name = user.UserName ?? string.Empty,
-                        Email = user.Email ?? string.Empty,
-                        Role = user.Role.ToString(),
-                        Status = user.Status.ToString()
-                    }
-                };
-
-                _logger.LogInformation("Token refresh successful for user: {UserId}", user.Id);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during token refresh");
-                return StatusCode(500, new { message = "An error occurred during token refresh" });
-            }
-        }
-
-        /// <summary>
-        /// Gets the current user's information
-        /// </summary>
-        /// <returns>Current user information</returns>
-        [HttpGet("me")]
+        /// <returns>Token validation result</returns>
+        [HttpPost("validate")]
         [Authorize]
-        [ProducesResponseType(typeof(UserInfo), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetCurrentUser()
+        public IActionResult ValidateToken()
         {
             try
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+                var merchantId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var merchantName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
+
+                if (string.IsNullOrEmpty(merchantId))
                 {
                     return Unauthorized(new { message = "Invalid token" });
                 }
 
-                var user = await _userManager.FindByIdAsync(userId.ToString());
-                if (user == null)
+                return Ok(new
                 {
-                    return NotFound(new { message = "User not found" });
-                }
-
-                var userInfo = new UserInfo
-                {
-                    Id = user.Id,
-                    Name = user.UserName,  
-                    Email = user.Email,
-                    Role = user.Role.ToString(),
-                    Status = user.Status.ToString()
-                };
-
-                return Ok(userInfo);
+                    message = "Token is valid",
+                    merchantId = Guid.Parse(merchantId),
+                    merchantName = merchantName,
+                    claims = User.Claims.Select(c => new { c.Type, c.Value })
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting current user");
-                return StatusCode(500, new { message = "An error occurred while getting user information" });
-            }
-        }
-
-        /// <summary>
-        /// Creates a new user account
-        /// </summary>
-        /// <param name="request">Create user request</param>
-        /// <returns>Created user and JWT tokens</returns>
-        [HttpPost("register")]
-        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Register([FromBody] CreateUserRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Registering new user with email: {Email}", request.Email);
-
-                var command = new CreateUserCommand
-                {
-                    Username = request.Username,
-                    Email = request.Email,
-                    Password = request.Password,
-                    Phone = request.Phone
-                };
-
-                var result = await _mediator.Send(command);
-
-                if (!result.Success)
-                {
-                    if (result.Message?.Contains("already exists") == true)
-                    {
-                        return Conflict(new { message = result.Message });
-                    }
-                    return BadRequest(new { message = result.Message, errors = result.Errors });
-                }
-
-                // Get the created user
-                var user = await _userManager.FindByIdAsync(result.Data!.Id.ToString());
-                if (user == null)
-                {
-                    return StatusCode(500, new { message = "User created but could not be retrieved" });
-                }
-
-                // Generate JWT tokens
-                var accessToken = _jwtService.GenerateAccessToken(user);
-                var refreshToken = _jwtService.GenerateRefreshToken();
-
-                var response = new LoginResponse
-                {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken,
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                    User = new UserInfo
-                    {
-                        Id = user.Id,
-                        Name = user.UserName ?? string.Empty,
-                        Email = user.Email ?? string.Empty,
-                        Role = user.Role.ToString(),
-                        Status = user.Status.ToString()
-                    }
-                };
-
-                _logger.LogInformation("User registered successfully: {UserId}", user.Id);
-                return CreatedAtAction(nameof(GetCurrentUser), new { }, response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during user registration for email: {Email}", request.Email);
-                return StatusCode(500, new { message = "An error occurred during registration" });
+                _logger.LogError(ex, "Error validating token");
+                return StatusCode(500, new { message = "An error occurred while validating token" });
             }
         }
     }

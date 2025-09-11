@@ -1,5 +1,6 @@
 using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.Domain.Validation;
+using CarlosAOliveira.Developer.Domain.ValueObjects;
 using CarlosAOliveira.Developer.Tests.Builders;
 using FluentAssertions;
 using FluentValidation.TestHelper;
@@ -120,13 +121,13 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var summary = DailySummaryBuilder.Create().Build();
             // Manually set negative value using reflection for testing
             var totalCreditsProperty = typeof(DailySummary).GetProperty("TotalCredits");
-            totalCreditsProperty?.SetValue(summary, -10m);
+            totalCreditsProperty?.SetValue(summary, new Money(-10m));
 
             // Act
             var result = _validator.TestValidate(summary);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.TotalCredits)
+            result.ShouldHaveValidationErrorFor(x => x.TotalCredits.Amount)
                 .WithErrorMessage("Total credits cannot be negative");
         }
 
@@ -137,13 +138,13 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var summary = DailySummaryBuilder.Create().Build();
             // Manually set negative value using reflection for testing
             var totalDebitsProperty = typeof(DailySummary).GetProperty("TotalDebits");
-            totalDebitsProperty?.SetValue(summary, -10m);
+            totalDebitsProperty?.SetValue(summary, new Money(-10m));
 
             // Act
             var result = _validator.TestValidate(summary);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.TotalDebits)
+            result.ShouldHaveValidationErrorFor(x => x.TotalDebits.Amount)
                 .WithErrorMessage("Total debits cannot be negative");
         }
 
@@ -157,13 +158,13 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var summary = DailySummaryBuilder.Create().Build();
             // Manually set value using reflection for testing
             var totalCreditsProperty = typeof(DailySummary).GetProperty("TotalCredits");
-            totalCreditsProperty?.SetValue(summary, totalCredits);
+            totalCreditsProperty?.SetValue(summary, new Money(totalCredits));
 
             // Act
             var result = _validator.TestValidate(summary);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(x => x.TotalCredits);
+            result.ShouldNotHaveValidationErrorFor(x => x.TotalCredits.Amount);
         }
 
         [Theory]
@@ -176,13 +177,13 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var summary = DailySummaryBuilder.Create().Build();
             // Manually set value using reflection for testing
             var totalDebitsProperty = typeof(DailySummary).GetProperty("TotalDebits");
-            totalDebitsProperty?.SetValue(summary, totalDebits);
+            totalDebitsProperty?.SetValue(summary, new Money(totalDebits));
 
             // Act
             var result = _validator.TestValidate(summary);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(x => x.TotalDebits);
+            result.ShouldNotHaveValidationErrorFor(x => x.TotalDebits.Amount);
         }
 
         [Fact]

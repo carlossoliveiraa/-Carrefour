@@ -4,6 +4,7 @@ using CarlosAOliveira.Developer.Application.DTOs.Base;
 using CarlosAOliveira.Developer.Application.DTOs.Cashflow;
 using CarlosAOliveira.Developer.Application.Handlers.Cashflow;
 using CarlosAOliveira.Developer.Application.Mappings;
+using CarlosAOliveira.Developer.Application.Services;
 using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.Domain.Enums;
 using CarlosAOliveira.Developer.Domain.Events;
@@ -50,10 +51,15 @@ namespace CarlosAOliveira.Developer.Tests.Application.Handlers
             _eventQueueMock.Setup(x => x.PublishAsync(It.IsAny<TransactionCreatedEvent>()))
                 .Returns(Task.CompletedTask);
 
+            var validationServiceMock = new Mock<IValidationService>();
+            validationServiceMock.Setup(x => x.ValidateTransactionAsync(It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<DateOnly>()))
+                .Returns(Task.FromResult(BaseResponse.CreateSuccess()));
+
             var handler = new CreateTransactionCommandHandler(
                 _transactionRepositoryMock.Object,
                 _eventQueueMock.Object,
-                _mapper
+                _mapper,
+                validationServiceMock.Object
             );
 
             // Act
@@ -85,10 +91,15 @@ namespace CarlosAOliveira.Developer.Tests.Application.Handlers
                 Description = "Test transaction"
             };
 
+            var validationServiceMock = new Mock<IValidationService>();
+            validationServiceMock.Setup(x => x.ValidateTransactionAsync(It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<DateOnly>()))
+                .Returns(Task.FromResult(BaseResponse.CreateSuccess()));
+
             var handler = new CreateTransactionCommandHandler(
                 _transactionRepositoryMock.Object,
                 _eventQueueMock.Object,
-                _mapper
+                _mapper,
+                validationServiceMock.Object
             );
 
             // Act
@@ -122,10 +133,15 @@ namespace CarlosAOliveira.Developer.Tests.Application.Handlers
             _eventQueueMock.Setup(x => x.PublishAsync(It.IsAny<TransactionCreatedEvent>()))
                 .Returns(Task.CompletedTask);
 
+            var validationServiceMock = new Mock<IValidationService>();
+            validationServiceMock.Setup(x => x.ValidateTransactionAsync(It.IsAny<decimal>(), It.IsAny<string>(), It.IsAny<DateOnly>()))
+                .Returns(Task.FromResult(BaseResponse.CreateSuccess()));
+
             var handler = new CreateTransactionCommandHandler(
                 _transactionRepositoryMock.Object,
                 _eventQueueMock.Object,
-                _mapper
+                _mapper,
+                validationServiceMock.Object
             );
 
             // Act

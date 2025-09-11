@@ -1,7 +1,7 @@
 namespace CarlosAOliveira.Developer.Api.DTOs.Auth
 {
     /// <summary>
-    /// Login response DTO
+    /// Response DTO for successful login
     /// </summary>
     public class LoginResponse
     {
@@ -16,44 +16,23 @@ namespace CarlosAOliveira.Developer.Api.DTOs.Auth
         public string RefreshToken { get; set; } = string.Empty;
 
         /// <summary>
-        /// Token expiration time
+        /// Token expiration time in seconds
         /// </summary>
-        public DateTime ExpiresAt { get; set; }
+        public int ExpiresIn { get; set; }
 
         /// <summary>
-        /// User information
+        /// Token type (Bearer)
         /// </summary>
-        public UserInfo User { get; set; } = new();
-    }
-
-    /// <summary>
-    /// User information DTO
-    /// </summary>
-    public class UserInfo
-    {
-        /// <summary>
-        /// User ID
-        /// </summary>
-        public Guid Id { get; set; }
+        public string TokenType { get; set; } = "Bearer";
 
         /// <summary>
-        /// User name
+        /// Merchant ID
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public Guid MerchantId { get; set; }
 
         /// <summary>
-        /// User email
+        /// Merchant name
         /// </summary>
-        public string Email { get; set; } = string.Empty;
-
-        /// <summary>
-        /// User role
-        /// </summary>
-        public string Role { get; set; } = string.Empty;
-
-        /// <summary>
-        /// User status
-        /// </summary>
-        public string Status { get; set; } = string.Empty;
+        public string MerchantName { get; set; } = string.Empty;
     }
 }

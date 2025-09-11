@@ -21,7 +21,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
 
             // Assert
             Assert.Equal(date, transaction.Date);
-            Assert.Equal(amount, transaction.Amount);
+            Assert.Equal(amount, transaction.Amount.Amount);
             Assert.Equal(type, transaction.Type);
             Assert.Equal(category, transaction.Category);
             Assert.Equal(description, transaction.Description);
