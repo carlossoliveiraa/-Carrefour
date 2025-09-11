@@ -14,6 +14,7 @@ namespace CarlosAOliveira.Developer.ORM
         public DbSet<Merchant> Merchants { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<DailySummary> DailySummaries { get; set; }
+        public DbSet<DailyBalance> DailyBalances { get; set; }
 
         public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
         {
@@ -28,6 +29,7 @@ namespace CarlosAOliveira.Developer.ORM
             modelBuilder.ApplyConfiguration(new MerchantConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new DailySummaryConfiguration());
+            modelBuilder.ApplyConfiguration(new DailyBalanceConfiguration());
         }
     }
     public class DefaultContextFactory : IDesignTimeDbContextFactory<DefaultContext>
@@ -42,11 +44,18 @@ namespace CarlosAOliveira.Developer.ORM
 
             var builder = new DbContextOptionsBuilder<DefaultContext>();
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-                       
-            builder.UseSqlServer(
-                connectionString,
-                b => b.MigrationsAssembly("CarlosAOliveira.Developer.ORM")
-            );
+            
+            if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Server="))
+            {
+                builder.UseSqlServer(
+                    connectionString,
+                    b => b.MigrationsAssembly("CarlosAOliveira.Developer.ORM")
+                );
+            }
+            else
+            {
+                builder.UseSqlite("Data Source=./runtime/cashflow.db");
+            }
 
             return new DefaultContext(builder.Options);
         }

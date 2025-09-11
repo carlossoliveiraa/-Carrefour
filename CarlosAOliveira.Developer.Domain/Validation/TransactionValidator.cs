@@ -10,11 +10,15 @@ namespace CarlosAOliveira.Developer.Domain.Validation
     {
         public TransactionValidator()
         {
-            RuleFor(x => x.MerchantId)
-                .NotEmpty().WithMessage("Merchant ID is required");
+            RuleFor(x => x.Date)
+                .NotEmpty().WithMessage("Date is required");
 
             RuleFor(x => x.Amount)
                 .GreaterThan(0).WithMessage("Amount must be greater than zero");
+
+            RuleFor(x => x.Category)
+                .NotEmpty().WithMessage("Category is required")
+                .MaximumLength(100).WithMessage("Category cannot exceed 100 characters");
 
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("Description is required")

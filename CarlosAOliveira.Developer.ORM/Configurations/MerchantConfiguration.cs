@@ -46,11 +46,6 @@ namespace CarlosAOliveira.Developer.ORM.Configurations
                 .HasDatabaseName("IX_Merchants_CreatedAt");
 
             // Relationships
-            builder.HasMany<Transaction>()
-                .WithOne()
-                .HasForeignKey(t => t.MerchantId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasMany<DailySummary>()
                 .WithOne()
                 .HasForeignKey(ds => ds.MerchantId)

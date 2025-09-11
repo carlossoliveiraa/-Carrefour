@@ -26,9 +26,9 @@ namespace CarlosAOliveira.Developer.Domain.Entities
         /// <summary>
         /// Creates a new transaction for this merchant
         /// </summary>
-        public Transaction CreateTransaction(decimal amount, TransactionType type, string description)
+        public Transaction CreateTransaction(DateOnly date, decimal amount, TransactionType type, string category, string description)
         {
-            var transaction = new Transaction(Id, amount, type, description);
+            var transaction = new Transaction(date, amount, type, category, description);
             AddDomainEvent(new TransactionCreatedEvent(transaction));
             return transaction;
         }

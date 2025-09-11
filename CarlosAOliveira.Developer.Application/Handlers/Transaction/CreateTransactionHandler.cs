@@ -31,8 +31,10 @@ namespace CarlosAOliveira.Developer.Application.Handlers.Transaction
             }
 
             var transaction = merchant.CreateTransaction(
+                request.Date,
                 request.Amount,
                 request.Type,
+                request.Category,
                 request.Description);
 
             await _transactionRepository.AddAsync(transaction);

@@ -1,9 +1,7 @@
 using CarlosAOliveira.Developer.Api.DTOs.Auth;
 using CarlosAOliveira.Developer.Api.Services;
 using CarlosAOliveira.Developer.Application.Commands.User;
-using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.Domain.Enums;
-using CarlosAOliveira.Developer.Domain.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -72,8 +70,8 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     User = new UserInfo
                     {
                         Id = user.Id,
-                        Name = user.UserName,
-                        Email = user.Email,
+                        Name = user.UserName ?? string.Empty,
+                        Email = user.Email ?? string.Empty,
                         Role = user.Role.ToString(),
                         Status = user.Status.ToString()
                     }
@@ -128,8 +126,8 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     User = new UserInfo
                     {
                         Id = user.Id,
-                        Name = user.UserName,
-                        Email = user.Email,
+                        Name = user.UserName ?? string.Empty,
+                        Email = user.Email ?? string.Empty,
                         Role = user.Role.ToString(),
                         Status = user.Status.ToString()
                     }
@@ -240,8 +238,8 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     User = new UserInfo
                     {
                         Id = user.Id,
-                        Name = user.UserName,
-                        Email = user.Email,
+                        Name = user.UserName ?? string.Empty,
+                        Email = user.Email ?? string.Empty,
                         Role = user.Role.ToString(),
                         Status = user.Status.ToString()
                     }

@@ -53,10 +53,7 @@ namespace CarlosAOliveira.Developer.Domain.Entities
         /// </summary>
         public void AddTransaction(Transaction transaction)
         {
-            if (transaction.MerchantId != MerchantId)
-                throw new InvalidOperationException("Transaction merchant ID does not match summary merchant ID");
-
-            if (transaction.CreatedAt.Date != Date)
+            if (transaction.Date.ToDateTime(TimeOnly.MinValue).Date != Date)
                 throw new InvalidOperationException("Transaction date does not match summary date");
 
             if (transaction.IsCredit)

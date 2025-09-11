@@ -19,9 +19,19 @@ namespace CarlosAOliveira.Developer.ORM
         /// </summary>
         public static IServiceCollection AddOrmLayer(this IServiceCollection services, IConfiguration configuration)
         {
-            // Database Context
+            // Database Context - SQLite by default, SQL Server if connection string is provided
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<DefaultContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            {
+                if (!string.IsNullOrEmpty(connectionString) && connectionString.Contains("Server="))
+                {
+                    options.UseSqlServer(connectionString);
+                }
+                else
+                {
+                    options.UseSqlite("Data Source=./runtime/cashflow.db");
+                }
+            });
 
             // Identity Services
             services.AddIdentityCore<User>(options =>
@@ -53,6 +63,7 @@ namespace CarlosAOliveira.Developer.ORM
             services.AddScoped<IMerchantRepository, MerchantRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IDailySummaryRepository, DailySummaryRepository>();
+            services.AddScoped<IDailyBalanceRepository, DailyBalanceRepository>();
 
             return services;
         }

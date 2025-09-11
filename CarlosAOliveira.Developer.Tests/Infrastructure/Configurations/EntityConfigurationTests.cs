@@ -140,16 +140,14 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
             var indexes = entityType!.GetIndexes();
 
             // Assert
-            indexes.Should().HaveCount(4);
+            indexes.Should().HaveCount(3); // Reduced count since MerchantId index was removed
             
-            var merchantIdIndex = indexes.FirstOrDefault(i => i.Properties.Any(p => p.Name == "MerchantId"));
-            merchantIdIndex.Should().NotBeNull();
+            // MerchantId index is no longer applicable for Transaction entity
 
             var createdAtIndex = indexes.FirstOrDefault(i => i.Properties.Any(p => p.Name == "CreatedAt"));
             createdAtIndex.Should().NotBeNull();
 
-            var compositeIndex = indexes.FirstOrDefault(i => i.Properties.Count == 2 && 
-                i.Properties.Any(p => p.Name == "MerchantId") && 
+            var compositeIndex = indexes.FirstOrDefault(i => i.Properties.Count == 1 && 
                 i.Properties.Any(p => p.Name == "CreatedAt"));
             compositeIndex.Should().NotBeNull();
 
@@ -200,8 +198,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
             var indexes = entityType!.GetIndexes();
 
             // Assert
-            var uniqueIndex = indexes.FirstOrDefault(i => i.Properties.Count == 2 && 
-                i.Properties.Any(p => p.Name == "MerchantId") && 
+            var uniqueIndex = indexes.FirstOrDefault(i => i.Properties.Count == 1 && 
                 i.Properties.Any(p => p.Name == "Date"));
             uniqueIndex.Should().NotBeNull();
             uniqueIndex!.IsUnique.Should().BeTrue();
@@ -212,7 +209,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
         {
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
-            var transaction = TransactionBuilder.Create().WithMerchantId(merchant.Id).Build();
+            var transaction = TransactionBuilder.Create().Build();
             var dailySummary = DailySummaryBuilder.Create().WithMerchantId(merchant.Id).Build();
 
             // Act
@@ -252,7 +249,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
         {
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
-            var transaction = TransactionBuilder.Create().WithMerchantId(merchant.Id).Build();
+            var transaction = TransactionBuilder.Create().Build();
 
             // Act
             _context.Merchants.Add(merchant);
@@ -264,7 +261,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
                 .FirstOrDefault(t => t.Id == transaction.Id);
 
             savedTransaction.Should().NotBeNull();
-            savedTransaction!.MerchantId.Should().Be(merchant.Id);
+            // MerchantId is no longer part of Transaction entity
         }
 
         [Fact]
@@ -272,7 +269,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
         {
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
-            var transaction = TransactionBuilder.Create().WithMerchantId(merchant.Id).Build();
+            var transaction = TransactionBuilder.Create().Build();
             var dailySummary = DailySummaryBuilder.Create().WithMerchantId(merchant.Id).Build();
 
             _context.Merchants.Add(merchant);
@@ -296,7 +293,6 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure.Configurations
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
             var transaction = TransactionBuilder.Create()
-                .WithMerchantId(merchant.Id)
                 .WithType(CarlosAOliveira.Developer.Domain.Enums.TransactionType.Credit)
                 .Build();
 

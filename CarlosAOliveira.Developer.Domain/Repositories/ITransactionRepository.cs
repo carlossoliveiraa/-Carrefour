@@ -13,17 +13,45 @@ namespace CarlosAOliveira.Developer.Domain.Repositories
         Task<Transaction?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets all transactions for a merchant
+        /// Gets all transactions for a specific date
         /// </summary>
-        Task<IEnumerable<Transaction>> GetByMerchantIdAsync(Guid merchantId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Transaction>> GetByDateAsync(DateOnly date, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets transactions for a merchant within a date range
+        /// Gets transactions within a date range
         /// </summary>
-        Task<IEnumerable<Transaction>> GetByMerchantIdAndDateRangeAsync(
-            Guid merchantId, 
-            DateTime startDate, 
-            DateTime endDate, 
+        Task<IEnumerable<Transaction>> GetByDateRangeAsync(
+            DateOnly startDate, 
+            DateOnly endDate, 
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets transactions by type
+        /// </summary>
+        Task<IEnumerable<Transaction>> GetByTypeAsync(
+            Domain.Enums.TransactionType type, 
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets transactions with pagination
+        /// </summary>
+        Task<(IEnumerable<Transaction> Items, int TotalCount)> GetPagedAsync(
+            int pageNumber, 
+            int pageSize, 
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the total amount by transaction type
+        /// </summary>
+        Task<decimal> GetTotalAmountByTypeAsync(
+            Domain.Enums.TransactionType type, 
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the count of transactions by type
+        /// </summary>
+        Task<int> GetCountByTypeAsync(
+            Domain.Enums.TransactionType type, 
             CancellationToken cancellationToken = default);
 
         /// <summary>
