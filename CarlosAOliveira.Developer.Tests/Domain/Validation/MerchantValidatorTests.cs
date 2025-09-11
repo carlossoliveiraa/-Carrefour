@@ -85,7 +85,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var result = _validator.TestValidate(merchant);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Email)
+            result.ShouldHaveValidationErrorFor(x => x.Email.Value)
                 .WithErrorMessage("Email is required");
         }
 
@@ -105,7 +105,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var result = _validator.TestValidate(merchant);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.Email)
+            result.ShouldHaveValidationErrorFor(x => x.Email.Value)
                 .WithErrorMessage("Invalid email format");
         }
 
@@ -125,7 +125,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var result = _validator.TestValidate(merchant);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(x => x.Email);
+            result.ShouldNotHaveValidationErrorFor(x => x.Email.Value);
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
 
             // Assert
             result.ShouldHaveValidationErrorFor(x => x.Name);
-            result.ShouldHaveValidationErrorFor(x => x.Email);
+            result.ShouldHaveValidationErrorFor(x => x.Email.Value);
             result.Errors.Should().HaveCount(2);
         }
     }

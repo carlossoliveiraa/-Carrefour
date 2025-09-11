@@ -17,10 +17,10 @@ namespace CarlosAOliveira.Developer.Domain.Validation
                 .NotEmpty().WithMessage("Date is required")
                 .LessThanOrEqualTo(DateTime.Today).WithMessage("Date cannot be in the future");
 
-            RuleFor(x => x.TotalCredits)
+            RuleFor(x => x.TotalCredits.Amount)
                 .GreaterThanOrEqualTo(0).WithMessage("Total credits cannot be negative");
 
-            RuleFor(x => x.TotalDebits)
+            RuleFor(x => x.TotalDebits.Amount)
                 .GreaterThanOrEqualTo(0).WithMessage("Total debits cannot be negative");
 
             RuleFor(x => x.TransactionCount)

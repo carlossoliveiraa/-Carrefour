@@ -1,8 +1,5 @@
-using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.Domain.Repositories;
 using CarlosAOliveira.Developer.ORM.Repositories;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,31 +30,7 @@ namespace CarlosAOliveira.Developer.ORM
                 }
             });
 
-            // Identity Services
-            services.AddIdentityCore<User>(options =>
-            {
-                // Password settings - mais flexível para desenvolvimento
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 6;
-
-                // User settings
-                options.User.RequireUniqueEmail = true;
-                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                
-                // SignIn settings
-                options.SignIn.RequireConfirmedEmail = false;
-                options.SignIn.RequireConfirmedPhoneNumber = false;
-                
-                // Lockout settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
-            })
-            .AddRoles<IdentityRole<Guid>>()
-            .AddEntityFrameworkStores<DefaultContext>();
+            // Identity Services removed - User entity was deleted
 
             // Repositories
             services.AddScoped<IMerchantRepository, MerchantRepository>();

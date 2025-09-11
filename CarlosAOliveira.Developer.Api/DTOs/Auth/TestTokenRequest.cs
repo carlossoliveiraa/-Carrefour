@@ -3,23 +3,20 @@ using System.ComponentModel.DataAnnotations;
 namespace CarlosAOliveira.Developer.Api.DTOs.Auth
 {
     /// <summary>
-    /// Request DTO for merchant login
+    /// Request DTO for generating test tokens
     /// </summary>
-    public class LoginRequest
+    public class TestTokenRequest
     {
+        /// <summary>
+        /// Merchant ID (optional, will generate if not provided)
+        /// </summary>
+        public Guid? MerchantId { get; set; }
+
         /// <summary>
         /// Merchant name
         /// </summary>
         [Required(ErrorMessage = "Merchant name is required")]
         [StringLength(100, ErrorMessage = "Merchant name cannot exceed 100 characters")]
         public string MerchantName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Merchant email
-        /// </summary>
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
-        [StringLength(255, ErrorMessage = "Email cannot exceed 255 characters")]
-        public string Email { get; set; } = string.Empty;
     }
 }

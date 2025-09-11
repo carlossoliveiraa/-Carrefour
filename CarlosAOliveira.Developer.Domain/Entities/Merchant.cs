@@ -1,6 +1,5 @@
 using CarlosAOliveira.Developer.Domain.Common;
-using CarlosAOliveira.Developer.Domain.Events;
-using CarlosAOliveira.Developer.Domain.Enums;
+using CarlosAOliveira.Developer.Domain.ValueObjects;
 
 namespace CarlosAOliveira.Developer.Domain.Entities
 {
@@ -9,37 +8,53 @@ namespace CarlosAOliveira.Developer.Domain.Entities
     /// </summary>
     public class Merchant : BaseEntity
     {
+        /// <summary>
+        /// Merchant name
+        /// </summary>
         public string Name { get; private set; } = string.Empty;
-        public string Email { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Merchant email
+        /// </summary>
+        public Email Email { get; private set; }
+
+        /// <summary>
+        /// Creation timestamp
+        /// </summary>
         public DateTime CreatedAt { get; private set; }
 
-        private Merchant() { } // EF Core constructor
+        private Merchant() 
+        { 
+            Email = new Email("default@example.com");
+        } // EF Core constructor
 
+        /// <summary>
+        /// Initializes a new instance of Merchant
+        /// </summary>
+        /// <param name="name">Merchant name</param>
+        /// <param name="email">Merchant email</param>
         public Merchant(string name, string email)
         {
             Id = Guid.NewGuid();
-            Name = name;
-            Email = email;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Email = new Email(email);
             CreatedAt = DateTime.UtcNow;
-        }
-
-        /// <summary>
-        /// Creates a new transaction for this merchant
-        /// </summary>
-        public Transaction CreateTransaction(DateOnly date, decimal amount, TransactionType type, string category, string description)
-        {
-            var transaction = new Transaction(date, amount, type, category, description);
-            AddDomainEvent(new TransactionCreatedEvent(transaction));
-            return transaction;
         }
 
         /// <summary>
         /// Updates merchant information
         /// </summary>
+        /// <param name="name">New name</param>
+        /// <param name="email">New email</param>
         public void UpdateInformation(string name, string email)
         {
-            Name = name;
-            Email = email;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Email = new Email(email);
         }
+
+        /// <summary>
+        /// Gets the email as string
+        /// </summary>
+        public string EmailString => Email.Value;
     }
 }

@@ -25,7 +25,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Events
             // Assert
             Assert.Equal(transaction.Id, domainEvent.TransactionId);
             Assert.Equal(transaction.Date, domainEvent.Date);
-            Assert.Equal(transaction.Amount, domainEvent.Amount);
+            Assert.Equal(transaction.Amount.Amount, domainEvent.Amount);
             Assert.Equal(transaction.Type.ToString(), domainEvent.TransactionType);
             Assert.True(domainEvent.DeletedAt <= DateTime.UtcNow);
         }
@@ -47,7 +47,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Events
 
             // Assert
             Assert.Equal("Debit", domainEvent.TransactionType);
-            Assert.Equal(transaction.Amount, domainEvent.Amount);
+            Assert.Equal(transaction.Amount.Amount, domainEvent.Amount);
         }
     }
 }

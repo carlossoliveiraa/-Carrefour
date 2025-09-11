@@ -13,7 +13,7 @@ namespace CarlosAOliveira.Developer.Domain.Validation
             RuleFor(x => x.Date)
                 .NotEmpty().WithMessage("Date is required");
 
-            RuleFor(x => x.Amount)
+            RuleFor(x => x.Amount.Amount)
                 .GreaterThan(0).WithMessage("Amount must be greater than zero");
 
             RuleFor(x => x.Category)

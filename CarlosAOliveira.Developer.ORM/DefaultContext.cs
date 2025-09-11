@@ -1,7 +1,5 @@
 ﻿using CarlosAOliveira.Developer.Domain.Entities;
 using CarlosAOliveira.Developer.ORM.Configurations;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +7,7 @@ using System.Reflection;
 
 namespace CarlosAOliveira.Developer.ORM
 {
-    public class DefaultContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    public class DefaultContext : DbContext
     {
         public DbSet<Merchant> Merchants { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
@@ -22,10 +20,7 @@ namespace CarlosAOliveira.Developer.ORM
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Apply Identity configurations first
-            base.OnModelCreating(modelBuilder);
-            
-            // Apply custom configurations for other entities only (excluding User)
+            // Apply custom configurations for entities
             modelBuilder.ApplyConfiguration(new MerchantConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new DailySummaryConfiguration());

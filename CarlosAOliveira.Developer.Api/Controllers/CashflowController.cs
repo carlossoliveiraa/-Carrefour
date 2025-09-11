@@ -1,28 +1,21 @@
 using CarlosAOliveira.Developer.Api.DTOs.Cashflow;
-using CarlosAOliveira.Developer.Application.Commands.Cashflow;
-using CarlosAOliveira.Developer.Application.Queries.Cashflow;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+using CarlosAOliveira.Developer.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CarlosAOliveira.Developer.Api.Controllers
 {
     /// <summary>
-    /// Cashflow controller for managing financial transactions and balances
+    /// Cashflow controller for managing financial transactions and daily balances
     /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    [Produces("application/json")]
-    [Authorize]
-    public class CashflowController : ControllerBase
+    [Route("api/cashflow")]
+    public class CashflowController : BaseController
     {
-        private readonly IMediator _mediator;
+        private readonly ICashflowApplicationService _cashflowService;
         private readonly ILogger<CashflowController> _logger;
 
-        public CashflowController(IMediator mediator, ILogger<CashflowController> logger)
+        public CashflowController(ICashflowApplicationService cashflowService, ILogger<CashflowController> logger)
         {
-            _mediator = mediator;
+            _cashflowService = cashflowService;
             _logger = logger;
         }
 
@@ -49,7 +42,8 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                 _logger.LogInformation("Creating transaction for date: {Date}, amount: {Amount}, type: {Type}", 
                     request.Date, request.Amount, request.Type);
 
-                var command = new CreateTransactionCommand
+                // Map API DTO to Application DTO
+                var applicationRequest = new Application.DTOs.Cashflow.CreateCashflowTransactionRequest
                 {
                     Date = request.Date,
                     Amount = request.Amount,
@@ -58,7 +52,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     Description = request.Description
                 };
 
-                var result = await _mediator.Send(command);
+                var result = await _cashflowService.CreateTransactionAsync(applicationRequest);
 
                 if (!result.Success)
                 {
@@ -88,8 +82,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
         {
             try
             {
-                var query = new GetTransactionByIdQuery { Id = id };
-                var result = await _mediator.Send(query);
+                var result = await _cashflowService.GetTransactionAsync(id);
 
                 if (!result.Success)
                 {
@@ -123,8 +116,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     return BadRequest(new { message = "Invalid date format. Use YYYY-MM-DD" });
                 }
 
-                var query = new GetDailyBalanceQuery { Date = parsedDate };
-                var result = await _mediator.Send(query);
+                var result = await _cashflowService.GetDailyBalanceAsync(parsedDate);
 
                 if (!result.Success)
                 {
@@ -137,6 +129,86 @@ namespace CarlosAOliveira.Developer.Api.Controllers
             {
                 _logger.LogError(ex, "Error retrieving daily balance for date {Date}", date);
                 return StatusCode(500, new { message = "An error occurred while retrieving the daily balance" });
+            }
+        }
+
+        /// <summary>
+        /// Gets daily summary by merchant ID and date
+        /// </summary>
+        /// <param name="merchantId">Merchant ID</param>
+        /// <param name="date">Date</param>
+        /// <returns>Daily summary details</returns>
+        [HttpGet("merchants/{merchantId}/daily-summary")]
+        [ProducesResponseType(typeof(DailySummaryResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetDailySummary(Guid merchantId, [FromQuery] string date)
+        {
+            try
+            {
+                if (!DateOnly.TryParse(date, out var parsedDate))
+                {
+                    return BadRequest(new { message = "Invalid date format. Use YYYY-MM-DD" });
+                }
+
+                var result = await _cashflowService.GetDailySummaryAsync(merchantId, parsedDate.ToDateTime(TimeOnly.MinValue));
+
+                if (!result.Success)
+                {
+                    return NotFound(new { message = result.Message });
+                }
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting daily summary for merchant: {MerchantId} on date: {Date}", merchantId, date);
+                return StatusCode(500, new { message = "An error occurred while getting the daily summary" });
+            }
+        }
+
+        /// <summary>
+        /// Gets period summary for a merchant
+        /// </summary>
+        /// <param name="merchantId">Merchant ID</param>
+        /// <param name="startDate">Start date</param>
+        /// <param name="endDate">End date</param>
+        /// <returns>Period summary</returns>
+        [HttpGet("merchants/{merchantId}/period-summary")]
+        [ProducesResponseType(typeof(PeriodSummaryResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetPeriodSummary(
+            Guid merchantId,
+            [FromQuery] string startDate,
+            [FromQuery] string endDate)
+        {
+            try
+            {
+                if (!DateOnly.TryParse(startDate, out var parsedStartDate) || 
+                    !DateOnly.TryParse(endDate, out var parsedEndDate))
+                {
+                    return BadRequest(new { message = "Invalid date format. Use YYYY-MM-DD" });
+                }
+
+                if (parsedStartDate >= parsedEndDate)
+                {
+                    return BadRequest(new { message = "Start date must be before end date" });
+                }
+
+                var result = await _cashflowService.GetPeriodSummaryAsync(merchantId, parsedStartDate.ToDateTime(TimeOnly.MinValue), parsedEndDate.ToDateTime(TimeOnly.MinValue));
+
+                if (!result.Success)
+                {
+                    return BadRequest(new { message = result.Message });
+                }
+
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting period summary for merchant: {MerchantId}", merchantId);
+                return StatusCode(500, new { message = "An error occurred while getting the period summary" });
             }
         }
     }

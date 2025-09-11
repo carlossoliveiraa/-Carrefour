@@ -1,4 +1,3 @@
-using CarlosAOliveira.Developer.Domain.Entities;
 using System.Security.Claims;
 
 namespace CarlosAOliveira.Developer.Api.Services
@@ -9,11 +8,12 @@ namespace CarlosAOliveira.Developer.Api.Services
     public interface IJwtService
     {
         /// <summary>
-        /// Generates a JWT access token for the user
+        /// Generates a JWT access token for a merchant
         /// </summary>
-        /// <param name="user">User entity</param>
+        /// <param name="merchantId">Merchant ID</param>
+        /// <param name="merchantName">Merchant name</param>
         /// <returns>JWT access token</returns>
-        string GenerateAccessToken(User user);
+        string GenerateAccessToken(Guid merchantId, string merchantName);
         
         /// <summary>
         /// Generates a refresh token
@@ -29,10 +29,10 @@ namespace CarlosAOliveira.Developer.Api.Services
         ClaimsPrincipal? ValidateToken(string token);
         
         /// <summary>
-        /// Extracts user ID from JWT token
+        /// Extracts merchant ID from JWT token
         /// </summary>
         /// <param name="token">JWT token</param>
-        /// <returns>User ID if valid, null otherwise</returns>
-        Guid? GetUserIdFromToken(string token);
+        /// <returns>Merchant ID if valid, null otherwise</returns>
+        Guid? GetMerchantIdFromToken(string token);
     }
 }

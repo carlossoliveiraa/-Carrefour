@@ -1,9 +1,7 @@
 using CarlosAOliveira.Developer.Api.DTOs.Merchants;
 using CarlosAOliveira.Developer.Application.Commands.Merchant;
-using CarlosAOliveira.Developer.Application.DTOs.Base;
 using CarlosAOliveira.Developer.Application.Queries.Merchant;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarlosAOliveira.Developer.Api.Controllers
@@ -11,11 +9,8 @@ namespace CarlosAOliveira.Developer.Api.Controllers
     /// <summary>
     /// Merchants management controller
     /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
-    [Produces("application/json")]
-    public class MerchantsController : ControllerBase
+    [Route("api/merchants")]
+    public class MerchantsController : BaseController
     {
         private readonly IMediator _mediator;
         private readonly ILogger<MerchantsController> _logger;
@@ -27,13 +22,13 @@ namespace CarlosAOliveira.Developer.Api.Controllers
         }
 
         /// <summary>
-        /// Gets all merchants with pagination
+        /// Gets all merchants
         /// </summary>
         /// <param name="pageNumber">Page number (default: 1)</param>
         /// <param name="pageSize">Page size (default: 10)</param>
         /// <returns>Paginated list of merchants</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(PagedResult<Application.DTOs.Merchant.MerchantDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MerchantListResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMerchants(
             [FromQuery] int pageNumber = 1,
@@ -43,7 +38,11 @@ namespace CarlosAOliveira.Developer.Api.Controllers
             {
                 _logger.LogInformation("Getting merchants - Page: {PageNumber}, Size: {PageSize}", pageNumber, pageSize);
 
-                var query = new GetMerchantsQuery { PageNumber = pageNumber, PageSize = pageSize };
+                var query = new GetMerchantsQuery
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize
+                };
                 var result = await _mediator.Send(query);
 
                 return Ok(result);
@@ -61,7 +60,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
         /// <param name="id">Merchant ID</param>
         /// <returns>Merchant details</returns>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Application.DTOs.Merchant.MerchantDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(MerchantResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMerchant(Guid id)
@@ -93,14 +92,14 @@ namespace CarlosAOliveira.Developer.Api.Controllers
         /// <param name="request">Create merchant request</param>
         /// <returns>Created merchant</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(Application.DTOs.Merchant.MerchantDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(MerchantResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreateMerchant([FromBody] CreateMerchantRequest request)
         {
             try
             {
-                _logger.LogInformation("Creating merchant with email: {Email}", request.Email);
+                _logger.LogInformation("Creating merchant: {MerchantName}", request.Name);
 
                 var command = new CreateMerchantCommand
                 {
@@ -110,31 +109,37 @@ namespace CarlosAOliveira.Developer.Api.Controllers
 
                 var result = await _mediator.Send(command);
 
-                return CreatedAtAction(nameof(GetMerchant), new { id = result.Data?.Id }, result);
+                if (!result.Success)
+                {
+                    return BadRequest(new { message = result.Message, errors = result.Errors });
+                }
+
+                _logger.LogInformation("Merchant created successfully: {MerchantId}", result.Data!.Id);
+                return CreatedAtAction(nameof(GetMerchant), new { id = result.Data.Id }, result.Data);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating merchant with email: {Email}", request.Email);
+                _logger.LogError(ex, "Error creating merchant: {MerchantName}", request.Name);
                 return StatusCode(500, new { message = "An error occurred while creating the merchant" });
             }
         }
 
         /// <summary>
-        /// Updates an existing merchant
+        /// Updates a merchant
         /// </summary>
         /// <param name="id">Merchant ID</param>
         /// <param name="request">Update merchant request</param>
         /// <returns>Updated merchant</returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(Application.DTOs.Merchant.MerchantDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(MerchantResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateMerchant(Guid id, [FromBody] UpdateMerchantRequest request)
         {
             try
             {
-                _logger.LogInformation("Updating merchant with ID: {MerchantId}", id);
+                _logger.LogInformation("Updating merchant: {MerchantId}", id);
 
                 var command = new UpdateMerchantCommand
                 {
@@ -145,16 +150,19 @@ namespace CarlosAOliveira.Developer.Api.Controllers
 
                 var result = await _mediator.Send(command);
 
-                if (result == null)
+                if (!result.Success)
                 {
-                    return NotFound(new { message = "Merchant not found" });
+                    return result.Errors.Any(e => e.Contains("not found")) 
+                        ? NotFound(new { message = result.Message })
+                        : BadRequest(new { message = result.Message, errors = result.Errors });
                 }
 
-                return Ok(result);
+                _logger.LogInformation("Merchant updated successfully: {MerchantId}", id);
+                return Ok(result.Data);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating merchant with ID: {MerchantId}", id);
+                _logger.LogError(ex, "Error updating merchant: {MerchantId}", id);
                 return StatusCode(500, new { message = "An error occurred while updating the merchant" });
             }
         }
@@ -172,7 +180,7 @@ namespace CarlosAOliveira.Developer.Api.Controllers
         {
             try
             {
-                _logger.LogInformation("Deleting merchant with ID: {MerchantId}", id);
+                _logger.LogInformation("Deleting merchant: {MerchantId}", id);
 
                 var command = new DeleteMerchantCommand { Id = id };
                 var result = await _mediator.Send(command);
@@ -182,11 +190,12 @@ namespace CarlosAOliveira.Developer.Api.Controllers
                     return NotFound(new { message = "Merchant not found" });
                 }
 
+                _logger.LogInformation("Merchant deleted successfully: {MerchantId}", id);
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting merchant with ID: {MerchantId}", id);
+                _logger.LogError(ex, "Error deleting merchant: {MerchantId}", id);
                 return StatusCode(500, new { message = "An error occurred while deleting the merchant" });
             }
         }
