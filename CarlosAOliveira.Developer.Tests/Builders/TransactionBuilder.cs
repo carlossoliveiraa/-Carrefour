@@ -9,26 +9,32 @@ namespace CarlosAOliveira.Developer.Tests.Builders
     /// </summary>
     public class TransactionBuilder : TestBase
     {
-        private Guid _merchantId = Guid.Empty;
+        private DateOnly _date = DateOnly.FromDateTime(DateTime.Today);
         private decimal _amount = 0;
         private TransactionType _type = TransactionType.Credit;
+        private string _category = string.Empty;
         private string _description = string.Empty;
-        private TransactionStatus _status = TransactionStatus.Pending;
 
         public TransactionBuilder()
         {
-            _merchantId = RandomGuid();
+            _date = DateOnly.FromDateTime(DateTime.Today);
             _amount = RandomAmount();
             _type = TransactionType.Credit;
+            _category = "Test Category";
             _description = RandomDescription();
-            _status = TransactionStatus.Pending;
         }
 
         public static TransactionBuilder Create() => new();
 
-        public TransactionBuilder WithMerchantId(Guid merchantId)
+        public TransactionBuilder WithDate(DateOnly date)
         {
-            _merchantId = merchantId;
+            _date = date;
+            return this;
+        }
+
+        public TransactionBuilder WithCategory(string category)
+        {
+            _category = category;
             return this;
         }
 
@@ -50,19 +56,13 @@ namespace CarlosAOliveira.Developer.Tests.Builders
             return this;
         }
 
-        public TransactionBuilder WithStatus(TransactionStatus status)
-        {
-            _status = status;
-            return this;
-        }
-
         public TransactionBuilder WithRandomData()
         {
-            _merchantId = RandomGuid();
+            _date = DateOnly.FromDateTime(DateTime.Today.AddDays(Random.Shared.Next(-30, 30)));
             _amount = RandomAmount();
             _type = Faker.PickRandom<TransactionType>();
+            _category = Faker.Commerce.Categories(1).First();
             _description = RandomDescription();
-            _status = Faker.PickRandom<TransactionStatus>();
             return this;
         }
 
@@ -80,7 +80,7 @@ namespace CarlosAOliveira.Developer.Tests.Builders
 
         public Transaction Build()
         {
-            return new Transaction(_merchantId, _amount, _type, _description);
+            return new Transaction(_date, _amount, _type, _category, _description);
         }
     }
 }

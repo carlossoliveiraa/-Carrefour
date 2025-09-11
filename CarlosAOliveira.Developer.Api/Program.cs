@@ -12,8 +12,12 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
-builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/carrefour-api-.log", rollingInterval: Serilog.RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -99,6 +103,7 @@ builder.Services.AddOrmLayer(builder.Configuration);
 
 // Add custom services
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<CarlosAOliveira.Developer.Domain.Events.IEventQueue, CarlosAOliveira.Developer.Application.Services.FileEventQueue>();
 
 // Add health checks
 builder.Services.AddHealthChecks();
@@ -134,11 +139,20 @@ app.MapControllers();
 
 app.MapHealthChecks("/health");
 
-// Ensure database is created
+// Ensure database is created and migrations are applied
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<CarlosAOliveira.Developer.ORM.DefaultContext>();
-    context.Database.EnsureCreated();
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<CarlosAOliveira.Developer.ORM.DefaultContext>();
+        context.Database.EnsureCreated();
+        Log.Information("Database initialized successfully");
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Error initializing database");
+    }
 }
 
+Log.Information("Starting Carrefour API...");
 app.Run();

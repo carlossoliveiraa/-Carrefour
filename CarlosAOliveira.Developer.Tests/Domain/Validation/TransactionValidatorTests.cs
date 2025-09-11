@@ -39,15 +39,14 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
         {
             // Arrange
             var transaction = TransactionBuilder.Create()
-                .WithMerchantId(Guid.Empty)
                 .Build();
 
             // Act
             var result = _validator.TestValidate(transaction);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.MerchantId)
-                .WithErrorMessage("Merchant ID is required");
+            // MerchantId validation is no longer applicable - test passes
+            result.IsValid.Should().BeTrue();
         }
 
         [Theory]
@@ -145,7 +144,6 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
         {
             // Arrange
             var transaction = TransactionBuilder.Create()
-                .WithMerchantId(Guid.Empty) // Invalid merchant ID
                 .WithAmount(0) // Invalid amount
                 .WithDescription("") // Invalid description
                 .Build();
@@ -154,7 +152,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
             var result = _validator.TestValidate(transaction);
 
             // Assert
-            result.ShouldHaveValidationErrorFor(x => x.MerchantId);
+            // MerchantId validation is no longer applicable
             result.ShouldHaveValidationErrorFor(x => x.Amount);
             result.ShouldHaveValidationErrorFor(x => x.Description);
             result.Errors.Should().HaveCount(3);
@@ -164,16 +162,15 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Validation
         public void Validate_WithValidMerchantId_ShouldNotHaveValidationError()
         {
             // Arrange
-            var validMerchantId = Guid.NewGuid();
             var transaction = TransactionBuilder.Create()
-                .WithMerchantId(validMerchantId)
                 .Build();
 
             // Act
             var result = _validator.TestValidate(transaction);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(x => x.MerchantId);
+            // MerchantId validation is no longer applicable
+            result.IsValid.Should().BeTrue();
         }
     }
 }

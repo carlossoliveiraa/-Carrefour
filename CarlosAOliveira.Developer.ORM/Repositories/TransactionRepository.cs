@@ -15,57 +15,52 @@ namespace CarlosAOliveira.Developer.ORM.Repositories
         }
 
         /// <summary>
-        /// Gets all transactions for a merchant
+        /// Gets all transactions for a specific date
         /// </summary>
-        public async Task<IEnumerable<Transaction>> GetByMerchantIdAsync(Guid merchantId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Transaction>> GetByDateAsync(DateOnly date, CancellationToken cancellationToken = default)
         {
             return await DbSet
-                .Where(t => t.MerchantId == merchantId)
+                .Where(t => t.Date == date)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
         /// <summary>
-        /// Gets transactions for a merchant within a date range
+        /// Gets transactions within a date range
         /// </summary>
-        public async Task<IEnumerable<Transaction>> GetByMerchantIdAndDateRangeAsync(
-            Guid merchantId, 
-            DateTime startDate, 
-            DateTime endDate, 
+        public async Task<IEnumerable<Transaction>> GetByDateRangeAsync(
+            DateOnly startDate, 
+            DateOnly endDate, 
             CancellationToken cancellationToken = default)
         {
             return await DbSet
-                .Where(t => t.MerchantId == merchantId && 
-                           t.CreatedAt >= startDate && 
-                           t.CreatedAt <= endDate)
+                .Where(t => t.Date >= startDate && t.Date <= endDate)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
         /// <summary>
-        /// Gets transactions by type for a merchant
+        /// Gets transactions by type
         /// </summary>
-        public async Task<IEnumerable<Transaction>> GetByMerchantIdAndTypeAsync(
-            Guid merchantId, 
+        public async Task<IEnumerable<Transaction>> GetByTypeAsync(
             TransactionType type, 
             CancellationToken cancellationToken = default)
         {
             return await DbSet
-                .Where(t => t.MerchantId == merchantId && t.Type == type)
+                .Where(t => t.Type == type)
                 .OrderByDescending(t => t.CreatedAt)
                 .ToListAsync(cancellationToken);
         }
 
         /// <summary>
-        /// Gets transactions with pagination for a merchant
+        /// Gets transactions with pagination
         /// </summary>
-        public async Task<(IEnumerable<Transaction> Items, int TotalCount)> GetPagedByMerchantIdAsync(
-            Guid merchantId,
+        public new async Task<(IEnumerable<Transaction> Items, int TotalCount)> GetPagedAsync(
             int pageNumber, 
             int pageSize, 
             CancellationToken cancellationToken = default)
         {
-            var query = DbSet.Where(t => t.MerchantId == merchantId);
+            var query = DbSet.AsQueryable();
             var totalCount = await query.CountAsync(cancellationToken);
             
             var items = await query
@@ -78,28 +73,26 @@ namespace CarlosAOliveira.Developer.ORM.Repositories
         }
 
         /// <summary>
-        /// Gets the total amount for a merchant by transaction type
+        /// Gets the total amount by transaction type
         /// </summary>
-        public async Task<decimal> GetTotalAmountByMerchantIdAndTypeAsync(
-            Guid merchantId, 
+        public async Task<decimal> GetTotalAmountByTypeAsync(
             TransactionType type, 
             CancellationToken cancellationToken = default)
         {
             return await DbSet
-                .Where(t => t.MerchantId == merchantId && t.Type == type)
+                .Where(t => t.Type == type)
                 .SumAsync(t => t.Amount, cancellationToken);
         }
 
         /// <summary>
-        /// Gets the count of transactions for a merchant by type
+        /// Gets the count of transactions by type
         /// </summary>
-        public async Task<int> GetCountByMerchantIdAndTypeAsync(
-            Guid merchantId, 
+        public async Task<int> GetCountByTypeAsync(
             TransactionType type, 
             CancellationToken cancellationToken = default)
         {
             return await DbSet
-                .CountAsync(t => t.MerchantId == merchantId && t.Type == type, cancellationToken);
+                .CountAsync(t => t.Type == type, cancellationToken);
         }
     }
 }

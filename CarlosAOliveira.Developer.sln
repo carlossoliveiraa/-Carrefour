@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarlosAOliveira.Developer.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarlosAOliveira.Developer.Api", "CarlosAOliveira.Developer.Api\CarlosAOliveira.Developer.Api.csproj", "{6B82211C-5166-4DF2-8F4C-2DCE10069E11}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarlosAOliveira.Developer.Worker", "CarlosAOliveira.Developer.Worker\CarlosAOliveira.Developer.Worker.csproj", "{8C9D2E3F-4A5B-4C6D-8E7F-9A0B1C2D3E4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{6B82211C-5166-4DF2-8F4C-2DCE10069E11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B82211C-5166-4DF2-8F4C-2DCE10069E11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B82211C-5166-4DF2-8F4C-2DCE10069E11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C9D2E3F-4A5B-4C6D-8E7F-9A0B1C2D3E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C9D2E3F-4A5B-4C6D-8E7F-9A0B1C2D3E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C9D2E3F-4A5B-4C6D-8E7F-9A0B1C2D3E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C9D2E3F-4A5B-4C6D-8E7F-9A0B1C2D3E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +88,7 @@ Global
 		{0E919492-45A7-4787-AC6F-35911AD41384} = {4AFDF17E-5AB8-4E03-89B1-0BA78B96F48F}
 		{D7A0FF6E-250C-46BE-A237-E1FBCF06FABC} = {09C139EB-2CD4-44AC-9803-211AEE33412D}
 		{6B82211C-5166-4DF2-8F4C-2DCE10069E11} = {2ACB24AE-54B6-4D1E-AF0A-4779C3802FB6}
+		{8C9D2E3F-4A5B-4C6D-8E7F-9A0B1C2D3E4F} = {93E8F5ED-3B48-46DE-821B-663CB0A6FA6E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA36689E-FE36-4DEE-B1E8-4EA341918107}

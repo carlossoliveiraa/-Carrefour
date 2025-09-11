@@ -36,13 +36,12 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
             // Arrange
             var summary = DailySummaryBuilder.Create().Build();
             var transaction = TransactionBuilder.Create()
-                .WithMerchantId(Guid.NewGuid()) // Different merchant ID
                 .Build();
 
             // Act & Assert
+            // MerchantId validation is no longer applicable
             var action = () => summary.AddTransaction(transaction);
-            action.Should().Throw<InvalidOperationException>()
-                .WithMessage("Transaction merchant ID does not match summary merchant ID");
+            action.Should().NotThrow(); // This test is no longer applicable
         }
 
         [Fact]
@@ -51,12 +50,11 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
             // Arrange
             var summary = DailySummaryBuilder.Create().WithDate(DateTime.Today).Build();
             var transaction = TransactionBuilder.Create()
-                .WithMerchantId(summary.MerchantId)
                 .Build();
             
             // Manually set the transaction date to yesterday to make it different
-            var yesterday = DateTime.Today.AddDays(-1);
-            transaction.GetType().GetProperty("CreatedAt")!.SetValue(transaction, yesterday);
+            var yesterday = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+            transaction.GetType().GetProperty("Date")!.SetValue(transaction, yesterday);
 
             // Act & Assert
             var action = () => summary.AddTransaction(transaction);

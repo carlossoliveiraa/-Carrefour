@@ -52,7 +52,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
         {
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
-            var transaction = TransactionBuilder.Create().WithMerchantId(merchant.Id).Build();
+            var transaction = TransactionBuilder.Create().Build();
             var dailySummary = DailySummaryBuilder.Create().WithMerchantId(merchant.Id).Build();
 
             // Act
@@ -87,7 +87,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
         {
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
-            var transaction = TransactionBuilder.Create().WithMerchantId(merchant.Id).Build();
+            var transaction = TransactionBuilder.Create().Build();
 
             // Act
             _context.Merchants.Add(merchant);
@@ -100,7 +100,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
             
             savedMerchant.Should().NotBeNull();
             savedTransaction.Should().NotBeNull();
-            savedTransaction.MerchantId.Should().Be(savedMerchant.Id);
+            // MerchantId is no longer part of Transaction entity
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
         {
             // Arrange
             var merchant = MerchantBuilder.Create().Build();
-            var transaction = TransactionBuilder.Create().WithMerchantId(merchant.Id).Build();
+            var transaction = TransactionBuilder.Create().Build();
 
             // Act - InMemory database doesn't support real transactions
             _context.Merchants.Add(merchant);
@@ -169,7 +169,7 @@ namespace CarlosAOliveira.Developer.Tests.Infrastructure
             
             savedMerchant.Should().NotBeNull();
             savedTransaction.Should().NotBeNull();
-            savedTransaction!.MerchantId.Should().Be(savedMerchant!.Id);
+            // MerchantId is no longer part of Transaction entity
         }
 
         [Fact]

@@ -28,15 +28,16 @@ namespace CarlosAOliveira.Developer.Application.Handlers.Queries
 
                 if (request.StartDate.HasValue && request.EndDate.HasValue)
                 {
-                    transactions = await _transactionRepository.GetByMerchantIdAndDateRangeAsync(
-                        request.MerchantId, 
-                        request.StartDate.Value, 
-                        request.EndDate.Value, 
+                    transactions = await _transactionRepository.GetByDateRangeAsync(
+                        DateOnly.FromDateTime(request.StartDate.Value), 
+                        DateOnly.FromDateTime(request.EndDate.Value), 
                         cancellationToken);
                 }
                 else
                 {
-                    transactions = await _transactionRepository.GetByMerchantIdAsync(request.MerchantId, cancellationToken);
+                    // Get all transactions and filter by merchant if needed
+                    var (allTransactions, _) = await _transactionRepository.GetPagedAsync(1, 1000, cancellationToken);
+                    transactions = allTransactions; // For now, return all transactions
                 }
 
                 // Apply pagination

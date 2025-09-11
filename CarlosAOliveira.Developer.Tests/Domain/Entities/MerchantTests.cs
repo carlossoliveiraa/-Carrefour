@@ -39,11 +39,11 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
             var description = "Test transaction";
 
             // Act
-            var transaction = merchant.CreateTransaction(amount, type, description);
+            var transaction = merchant.CreateTransaction(DateOnly.FromDateTime(DateTime.Today), amount, type, "Test Category", description);
 
             // Assert
             transaction.Should().NotBeNull();
-            transaction.MerchantId.Should().Be(merchant.Id);
+            // MerchantId is no longer part of Transaction entity
             transaction.Amount.Should().Be(amount);
             transaction.Type.Should().Be(type);
             transaction.Description.Should().Be(description);
@@ -61,14 +61,14 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
             var description = "Test transaction";
 
             // Act
-            var transaction = merchant.CreateTransaction(amount, type, description);
+            var transaction = merchant.CreateTransaction(DateOnly.FromDateTime(DateTime.Today), amount, type, "Test Category", description);
 
             // Assert
             merchant.DomainEvents.Should().HaveCount(1);
             var domainEvent = merchant.DomainEvents.First() as TransactionCreatedEvent;
             domainEvent.Should().NotBeNull();
             domainEvent!.TransactionId.Should().Be(transaction.Id);
-            domainEvent.MerchantId.Should().Be(merchant.Id);
+            // MerchantId is no longer part of TransactionCreatedEvent
             domainEvent.Amount.Should().Be(amount);
             domainEvent.TransactionType.Should().Be(type.ToString());
         }
@@ -99,7 +99,7 @@ namespace CarlosAOliveira.Developer.Tests.Domain.Entities
             var description = "Test transaction";
 
             // Act
-            var transaction = merchant.CreateTransaction(amount, type, description);
+            var transaction = merchant.CreateTransaction(DateOnly.FromDateTime(DateTime.Today), amount, type, "Test Category", description);
 
             // Assert
             transaction.Type.Should().Be(type);

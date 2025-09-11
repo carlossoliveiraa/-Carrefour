@@ -9,20 +9,22 @@ namespace CarlosAOliveira.Developer.Domain.Entities
     /// </summary>
     public class Transaction : BaseEntity
     {
-        public Guid MerchantId { get; private set; }
+        public DateOnly Date { get; private set; }
         public decimal Amount { get; private set; }
         public TransactionType Type { get; private set; }
+        public string Category { get; private set; } = string.Empty;
         public string Description { get; private set; } = string.Empty;
         public DateTime CreatedAt { get; private set; }
 
         private Transaction() { } // EF Core constructor
 
-        public Transaction(Guid merchantId, decimal amount, TransactionType type, string description)
+        public Transaction(DateOnly date, decimal amount, TransactionType type, string category, string description)
         {
             Id = Guid.NewGuid();
-            MerchantId = merchantId;
+            Date = date;
             Amount = amount;
             Type = type;
+            Category = category;
             Description = description;
             CreatedAt = DateTime.UtcNow;
         }

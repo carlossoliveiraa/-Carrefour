@@ -23,9 +23,10 @@ namespace CarlosAOliveira.Developer.ORM.Configurations
                 .IsRequired()
                 .ValueGeneratedNever(); // We generate GUIDs manually
 
-            builder.Property(t => t.MerchantId)
+            builder.Property(t => t.Date)
                 .IsRequired()
-                .HasColumnName("MerchantId");
+                .HasConversion<DateOnlyConverter, DateOnlyComparer>()
+                .HasColumnName("Date");
 
             builder.Property(t => t.Amount)
                 .IsRequired()
@@ -36,6 +37,11 @@ namespace CarlosAOliveira.Developer.ORM.Configurations
                 .IsRequired()
                 .HasConversion<int>()
                 .HasColumnName("Type");
+
+            builder.Property(t => t.Category)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("Category");
 
             builder.Property(t => t.Description)
                 .IsRequired()
@@ -48,23 +54,17 @@ namespace CarlosAOliveira.Developer.ORM.Configurations
                 .HasColumnName("CreatedAt");
 
             // Indexes
-            builder.HasIndex(t => t.MerchantId)
-                .HasDatabaseName("IX_Transactions_MerchantId");
+            builder.HasIndex(t => t.Date)
+                .HasDatabaseName("IX_Transactions_Date");
 
             builder.HasIndex(t => t.CreatedAt)
                 .HasDatabaseName("IX_Transactions_CreatedAt");
 
-            builder.HasIndex(t => new { t.MerchantId, t.CreatedAt })
-                .HasDatabaseName("IX_Transactions_MerchantId_CreatedAt");
-
             builder.HasIndex(t => t.Type)
                 .HasDatabaseName("IX_Transactions_Type");
 
-            // Foreign key relationship
-            builder.HasOne<Merchant>()
-                .WithMany()
-                .HasForeignKey(t => t.MerchantId)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.HasIndex(t => t.Category)
+                .HasDatabaseName("IX_Transactions_Category");
         }
     }
 }

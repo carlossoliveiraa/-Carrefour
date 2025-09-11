@@ -1,0 +1,87 @@
+### Cashflow API Examples
+### Base URL: https://localhost:7001
+
+### Variables
+@baseUrl = https://localhost:7001
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. Login to get JWT token
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin123!"
+}
+
+### 2. Create a Credit Transaction
+POST {{baseUrl}}/api/cashflow/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Idempotency-Key: credit-001
+
+{
+  "date": "2024-01-15",
+  "amount": 1000.50,
+  "type": "Credit",
+  "category": "Sales",
+  "description": "Venda de produto"
+}
+
+### 3. Create a Debit Transaction
+POST {{baseUrl}}/api/cashflow/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Idempotency-Key: debit-001
+
+{
+  "date": "2024-01-15",
+  "amount": 250.75,
+  "type": "Debit",
+  "category": "Expenses",
+  "description": "Compra de material"
+}
+
+### 4. Get Transaction by ID
+GET {{baseUrl}}/api/cashflow/transactions/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer {{token}}
+
+### 5. Get Daily Balance
+GET {{baseUrl}}/api/cashflow/consolidated/daily?date=2024-01-15
+Authorization: Bearer {{token}}
+
+### 6. Health Check
+GET {{baseUrl}}/health
+
+### 7. Create Multiple Transactions for Testing
+POST {{baseUrl}}/api/cashflow/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Idempotency-Key: credit-002
+
+{
+  "date": "2024-01-16",
+  "amount": 500.00,
+  "type": "Credit",
+  "category": "Services",
+  "description": "Serviço prestado"
+}
+
+###
+
+POST {{baseUrl}}/api/cashflow/transactions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Idempotency-Key: debit-002
+
+{
+  "date": "2024-01-16",
+  "amount": 100.00,
+  "type": "Debit",
+  "category": "Utilities",
+  "description": "Conta de luz"
+}
+
+### 8. Get Balance for Different Date
+GET {{baseUrl}}/api/cashflow/consolidated/daily?date=2024-01-16
+Authorization: Bearer {{token}}

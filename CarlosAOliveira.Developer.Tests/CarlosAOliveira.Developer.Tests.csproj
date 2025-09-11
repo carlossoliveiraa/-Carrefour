@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Bogus" Version="35.6.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="FluentAssertions" Version="6.12.1" />
@@ -26,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CarlosAOliveira.Developer.Domain\CarlosAOliveira.Developer.Domain.csproj" />
+    <ProjectReference Include="..\CarlosAOliveira.Developer.Application\CarlosAOliveira.Developer.Application.csproj" />
     <ProjectReference Include="..\CarlosAOliveira.Developer.ORM\CarlosAOliveira.Developer.ORM.csproj" />
   </ItemGroup>
 
