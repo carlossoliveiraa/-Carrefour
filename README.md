@@ -1,8 +1,8 @@
-# 💰 Sistema Cashflow - Refatorado
+# 💰 Sistema Cashflow
 
 Sistema de lançamentos financeiros diários com consolidado de saldo por dia, implementado em .NET 9 com **arquitetura de nível sênior** seguindo princípios de Clean Architecture e Domain-Driven Design.
 
-## 🏗️ Arquitetura Refatorada
+## 🏗️ Arquitetura
 
 - **Clean Architecture**: Separação clara de responsabilidades
 - **Domain-Driven Design**: Entidades, Value Objects e Domain Services
@@ -11,7 +11,7 @@ Sistema de lançamentos financeiros diários com consolidado de saldo por dia, i
 - **Performance**: Cache, rate limiting e métricas
 - **Monitoramento**: Logs estruturados e métricas em tempo real
 
-## 📁 Estrutura do Projeto Refatorado
+## 📁 Estrutura do Projeto
 
 ```
 CarlosAOliveira.Developer/
