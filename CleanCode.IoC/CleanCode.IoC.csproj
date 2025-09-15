@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CleanCode.Application\CleanCode.Application.csproj" />
+    <ProjectReference Include="..\CleanCode.Common\CleanCode.Common.csproj" />
+    <ProjectReference Include="..\CleanCode.Domain\CleanCode.Domain.csproj" />
+    <ProjectReference Include="..\CleanCode.ORM\CleanCode.ORM.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+  </ItemGroup>
+
+</Project>

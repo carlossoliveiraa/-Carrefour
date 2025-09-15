@@ -1,0 +1,21 @@
+Message ID: 4b4a6042-aa9b-4dae-bd0c-eafe9239615c
+Queue: transaction_created
+Type: TransactionCreatedMessage
+Created At: 2025-09-15 18:33:19 UTC
+
+Content:
+{
+  "TransactionId": "925f29f5-f1fa-4ffc-c768-08ddf48657dd",
+  "Description": "Mateste",
+  "Amount": 2230,
+  "Type": "Debit",
+  "TransactionDate": "2025-09-15T18:33:07.013Z",
+  "Category": "bbbbb",
+  "Notes": "cccc",
+  "CreatedAt": "2025-09-15T18:33:19.4413611Z",
+  "SourceIp": null,
+  "UserAgent": null
+}
+
+Additional Data:
+{"Type":"CleanCode.Common.Messaging.Models.TransactionCreatedMessage"}

@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CleanCode.Application\CleanCode.Application.csproj" />
+	  <ProjectReference Include="..\CleanCode.Common\CleanCode.Common.csproj" />
+	  <ProjectReference Include="..\CleanCode.IoC\CleanCode.IoC.csproj" />
+	  <ProjectReference Include="..\CleanCode.ORM\CleanCode.ORM.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="logs\" />
+	  <Folder Include="Mappings\" />
+	  <Folder Include="queues\user_accessed\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+	</ItemGroup>
+</Project>

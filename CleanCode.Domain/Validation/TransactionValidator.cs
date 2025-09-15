@@ -1,0 +1,49 @@
+using CleanCode.Domain.Entities;
+using FluentValidation;
+
+namespace CleanCode.Domain.Validation
+{
+    /// <summary>
+    /// Validador para entidade Transaction
+    /// </summary>
+    public class TransactionValidator : AbstractValidator<Transaction>
+    {
+        /// <summary>
+        /// Construtor com regras de validação
+        /// </summary>
+        public TransactionValidator()
+        {
+            RuleFor(transaction => transaction.Description)
+                .NotEmpty()
+                .WithMessage("A descrição da transação é obrigatória")
+                .MaximumLength(200)
+                .WithMessage("A descrição não pode ter mais de 200 caracteres");
+
+            RuleFor(transaction => transaction.Amount)
+                .GreaterThan(0)
+                .WithMessage("O valor da transação deve ser maior que zero")
+                .LessThan(1000000)
+                .WithMessage("O valor da transação não pode ser maior que 1.000.000");
+
+            RuleFor(transaction => transaction.Type)
+                .NotEqual(Domain.Enum.TransactionType.None)
+                .WithMessage("O tipo da transação deve ser Débito ou Crédito");
+
+            RuleFor(transaction => transaction.TransactionDate)
+                .NotEqual(default(DateTime))
+                .WithMessage("A data da transação é obrigatória")
+                .LessThanOrEqualTo(DateTime.UtcNow.AddDays(1))
+                .WithMessage("A data da transação não pode ser no futuro");
+
+            RuleFor(transaction => transaction.Category)
+                .MaximumLength(100)
+                .WithMessage("A categoria não pode ter mais de 100 caracteres")
+                .When(transaction => !string.IsNullOrEmpty(transaction.Category));
+
+            RuleFor(transaction => transaction.Notes)
+                .MaximumLength(500)
+                .WithMessage("As observações não podem ter mais de 500 caracteres")
+                .When(transaction => !string.IsNullOrEmpty(transaction.Notes));
+        }
+    }
+}
