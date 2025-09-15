@@ -1,107 +1,91 @@
-🏦 CleanCode – Sistema de Controle de Fluxo de Caixa
-📋 Visão Geral
+# 🏦 CleanCode -- Sistema de Controle de Fluxo de Caixa
 
-API RESTful em .NET 9 para gestão completa de fluxo de caixa, desenvolvida com Clean Architecture e princípios SOLID.
-Funcionalidades principais:
+## 📋 Visão Geral
 
-🔐 Autenticação JWT com Bearer token flexível
+API RESTful em **.NET 9** para **gestão completa de fluxo de caixa**,
+desenvolvida com **Clean Architecture** e princípios **SOLID**.
 
-👥 Gestão de usuários com roles e status
+Funcionalidades principais: - 🔐 **Autenticação JWT** com Bearer token
+flexível\
+- 👥 **Gestão de usuários** com roles e status\
+- 💰 **Controle de transações** (débitos e créditos)\
+- 📊 **Consolidação automática** de saldo diário\
+- 📨 **Mensageria** baseada em filas (file-based)\
+- 🧪 **Testes automatizados** (111 testes unitários e de integração)
 
-💰 Controle de transações (débitos e créditos)
+## 🏗️ Arquitetura
 
-📊 Consolidação automática de saldo diário
+### Estrutura de Camadas
 
-📨 Mensageria baseada em filas (file-based)
+    CleanCode/
+    ├── CleanCode.Api/         # Apresentação (Controllers, Swagger, Middlewares)
+    ├── CleanCode.Application/ # Casos de uso (CQRS, Handlers, Validations)
+    ├── CleanCode.Domain/      # Entidades e regras de negócio
+    ├── CleanCode.ORM/         # Acesso a dados (EF Core, Repositories, Migrations)
+    ├── CleanCode.Common/      # Infra compartilhada (Security, Logging, Messaging)
+    ├── CleanCode.IoC/         # Injeção de dependência
+    └── CleanCode.Tests/       # Testes unitários e de integração
 
-🧪 Testes automatizados (111 testes entre unitários e integração)
+### Padrões e Princípios-Chave
 
-🏗️ Arquitetura
-Estrutura de Camadas
-CleanCode/
-├── Api/           # Apresentação (Controllers, Swagger, Middlewares)
-├── Application/   # Casos de uso (CQRS, Handlers, Validations)
-├── Domain/        # Entidades e regras de negócio
-├── ORM/           # Acesso a dados (EF Core, Repositories, Migrations)
-├── Common/        # Infra compartilhada (Security, Logging, Messaging)
-├── IoC/           # Injeção de dependência
-└── Tests/         # Testes unitários e de integração
+-   **Clean Architecture**: domínio independente de frameworks;
+    dependências fluem sempre para dentro.\
+-   **CQRS + MediatR**: comandos (escrita) e queries (leitura)
+    separados.\
+-   **Repository Pattern**: abstração de acesso a dados.\
+-   **Specification Pattern**: regras de consulta reutilizáveis.\
+-   **Pipeline Behavior**: validação e logging centralizados.\
+-   **Mensageria assíncrona**: filas em sistema de arquivos.
 
-Padrões e Princípios-Chave
+## 🔧 Stack e Ferramentas
 
-Clean Architecture: Domínio independente de frameworks, dependências sempre fluindo para dentro.
+-   **.NET 9**, **Entity Framework Core**, **SQL Server**\
+-   **MediatR**, **AutoMapper**, **FluentValidation**\
+-   **JWT + BCrypt** para autenticação e segurança\
+-   **Serilog** para logging estruturado e health checks\
+-   **xUnit**, **Moq**, **Bogus**, **FluentAssertions** para testes\
+-   **Swagger** com autenticação integrada
 
-CQRS + MediatR: Separação entre comandos (escrita) e queries (leitura).
+## 🔑 Segurança e Observabilidade
 
-Repository Pattern: Acesso a dados abstraído em interfaces.
+-   **JWT Bearer flexível** (aceita token com ou sem prefixo Bearer)\
+-   Hash de senhas seguro com **BCrypt**\
+-   Middleware global para tratamento de exceções\
+-   **Health checks** para banco, mensageria e dependências\
+-   Logging otimizado com rotação diária e retenção de 7 dias
 
-Specification Pattern: Regras de consulta reutilizáveis e composáveis.
+## 🚀 Fluxo de Dados
 
-Pipeline Behavior: Validação e logging centralizados.
+    Request → Controller → MediatR → Handler → Repository → Banco
+                    ↓
+    Response ← DTO ← Mapper ← Result ← Entity ← ORM
+                    ↓
+    Message → MessageService → Queue (File System)
 
-Mensageria assíncrona: Fila de mensagens via sistema de arquivos.
+## 🧪 Testes
 
-🔧 Stack e Ferramentas
+-   **111 testes passando** (unitários, de integração e de domínio)\
+-   Cobertura total de casos de uso, controllers e serviços de
+    infraestrutura\
+-   Ferramentas: **xUnit**, **Moq**, **FluentAssertions**, **Bogus**
 
-.NET 9, Entity Framework Core, SQL Server
+## 💡 Benefícios Arquiteturais
 
-MediatR, AutoMapper, FluentValidation
+-   **Manutenibilidade**: código desacoplado e organizado\
+-   **Escalabilidade**: pronto para crescimento e novas features\
+-   **Flexibilidade**: troca de implementações sem impacto no domínio\
+-   **Segurança e Resiliência**: autenticação robusta e health checks\
+-   **Alta Testabilidade**: camadas isoladas facilitam cobertura
+    automatizada
 
-JWT + BCrypt para autenticação e segurança
+## 📌 Conclusão
 
-Serilog para logging estruturado e health checks
+O **CleanCode** demonstra domínio em **arquitetura moderna** e padrões
+consagrados:
 
-xUnit, Moq, Bogus, FluentAssertions para testes
+-   **Clean Architecture + CQRS + SOLID**\
+-   **Repository e Specification Pattern**\
+-   **Mensageria assíncrona e logging estruturado**
 
-Swagger com autenticação integrada
-
-🔑 Segurança e Observabilidade
-
-JWT Bearer flexível (aceita token com ou sem prefixo Bearer)
-
-Hash seguro de senhas com BCrypt
-
-Middleware global de tratamento de exceções
-
-Health checks para banco, mensageria e dependências
-
-Logging otimizado com rotação diária e retenção de 7 dias
-
-🚀 Fluxo de Dados
-Request → Controller → MediatR → Handler → Repository → Banco
-                ↓
-Response ← DTO ← Mapper ← Result ← Entity ← ORM
-                ↓
-Message → MessageService → Queue (File System)
-
-🧪 Testes
-
-111 testes passando (unitários, de integração e de domínio)
-
-Cobertura de casos de uso, controllers e serviços de infraestrutura
-
-Ferramentas: xUnit, Moq, FluentAssertions e Bogus
-
-💡 Benefícios Arquiteturais
-
-Manutenibilidade: código desacoplado e organizado
-
-Escalabilidade: pronto para crescer em volume e features
-
-Flexibilidade: troca de implementações sem impacto no domínio
-
-Segurança e Resiliência: autenticação robusta e health checks
-
-Alta Testabilidade: camadas isoladas facilitam cobertura automatizada
-
-📌 Conclusão
-
-O CleanCode demonstra domínio em arquitetura moderna e padrões consagrados, aplicando:
-
-Clean Architecture + CQRS + SOLID
-
-Repository e Specification Pattern
-
-Mensageria assíncrona e logging estruturado
-
-Resultado: um sistema robusto, escalável e totalmente testado, pronto para produção e fácil de evoluir.
+Resultado: um sistema **robusto, escalável e totalmente testado**,
+pronto para produção e evolução contínua.
