@@ -1,4 +1,4 @@
-# 🏦 CleanCode --- Sistema de Controle de Fluxo de Caixa - Desafio Carrefour
+# Sistema de Controle de Fluxo de Caixa - Desafio Carrefour
 
 ## 📋 Visão Geral
 
